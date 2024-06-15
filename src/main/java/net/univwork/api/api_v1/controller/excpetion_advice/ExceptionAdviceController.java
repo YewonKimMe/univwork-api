@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.response.ErrorResultAndMessage;
 import net.univwork.api.api_v1.exception.BlockedClientException;
 import net.univwork.api.api_v1.exception.NoUserCodeException;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -76,7 +75,7 @@ public class ExceptionAdviceController {
      * @param e BlockedClientException
      * @return ErrorResultAndMessage
      * @apiNote POST, PUT, PATCH, DELETE HTTP 요청 시 차단된 uuid 또는 ip 인 경우<br>AOP @Around 에서 발생
-     * @see co.kr.univwork.univwork.aop.UserCheckAOP#userCheck(ProceedingJoinPoint) AOP 발생 예시
+     * @see net.univwork.api.api_v1.aop.UserCheckAop AOP 발생 예시
      * @see ErrorResultAndMessage
      * */
     @ResponseStatus(HttpStatus.FORBIDDEN)
