@@ -1,0 +1,18 @@
+package net.univwork.api.api_v1.enums;
+
+import lombok.Getter;
+
+@Getter
+public enum CookieName {
+
+    USER_COOKIE("PFUCU_4FC2127GC12K41"),
+
+    BLOCKED_FIRST_CHECK_COOKIE("K4F3S1F4528P12MKO41ZZX0");
+
+    private final String cookieName;
+
+    CookieName(String value) {
+        this.cookieName = value;
+    }
+
+}
