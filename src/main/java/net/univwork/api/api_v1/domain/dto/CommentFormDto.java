@@ -19,11 +19,11 @@ public class CommentFormDto {
     private String password;
 
     @NotBlank(message = "댓글은 공백을 입력하실 수 없습니다.")
-    @Size(max = 255, message = "댓글은 최대 255자 까지 입력 가능합니다.")
+    @Size(max = 100, message = "댓글은 최대 1000자 까지 입력 가능합니다.")
     private String comment;
 
-    @Email(message = "올바른 이메일을 입력해주세요.")
-    private String email;
+//    @Email(message = "올바른 이메일을 입력해주세요.")
+//    private String email;
 
     private Long univCode;
 
