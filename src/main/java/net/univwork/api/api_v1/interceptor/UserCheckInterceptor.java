@@ -20,12 +20,16 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class UserCheckInterceptor implements HandlerInterceptor {
 
+
+    /**
+     * 유저 확인 및 검증 인터셉터
+     * */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (!CookieUtils.checkCookie(request, CookieName.USER_COOKIE)) {
             Cookie cookie = new Cookie(ConstString.USER_COOKIE, UUID.randomUUID().toString());
             cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(30)); // 쿠키 유효기간은 30일
-            cookie.setPath("/api/v1"); // /api/v1 경로 이하에 모두 적용
+            cookie.setPath("/"); // / 경로 이하에 모두 적용
             response.addCookie(cookie);
             log.info("[신규 유저 확인: 유저명={}, 시간={}]", cookie.getValue(), new Timestamp(System.currentTimeMillis()));
         }
