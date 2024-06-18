@@ -34,14 +34,12 @@ public class CommentDto {
 
     private boolean reportFlag;
 
-    private String userIp;
-
     private String author;
 
     public CommentDto() {
     }
 
-    public CommentDto(Long commentCode, Long univCode, Long workplaceCode, String workplaceName, String univName, String comment_uuid, String comment, int upvote, String nickname, Timestamp timestamp, boolean deleteFlag, boolean reportFlag, String userIp, String author) {
+    public CommentDto(Long commentCode, Long univCode, Long workplaceCode, String workplaceName, String univName, String comment_uuid, String comment, int upvote, String nickname, Timestamp timestamp, boolean deleteFlag, boolean reportFlag, String author) {
         this.commentCode = commentCode;
         this.univCode = univCode;
         this.workplaceCode = workplaceCode;
@@ -54,7 +52,6 @@ public class CommentDto {
         this.timestamp = timestamp;
         this.deleteFlag = deleteFlag;
         this.reportFlag = reportFlag;
-        this.userIp = userIp;
         this.author = author;
     }
 
@@ -71,7 +68,6 @@ public class CommentDto {
         this.timestamp = workplaceComment.getTimestamp();
         this.deleteFlag = workplaceComment.isDeleteFlag();
         this.reportFlag = workplaceComment.isReportFlag();
-        this.userIp = workplaceComment.getUserIp();
         this.author = UUIDConverter.convertBinary16ToUUID(workplaceComment.getAuthor()).toString();
     }
 }
