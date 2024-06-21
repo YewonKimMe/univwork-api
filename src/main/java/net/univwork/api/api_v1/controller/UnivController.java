@@ -95,7 +95,7 @@ public class UnivController {
             @RequestParam(name = "workplace-name", required = false) final String workplaceSearchKeyword,
             @RequestParam(name = "workplace-type", required = false) final String workplaceTypeParam,
             @RequestParam(name = "sort", defaultValue = ConstString.WORKPLACE_NAME_ASC) final String sortParam,
-            PagedResourcesAssembler assembler) {
+            @Parameter(hidden = true) PagedResourcesAssembler assembler) {
 
         // 정렬 옵션 enum 획득
         SortOption sortOption = SortOption.fromValue(sortParam);
