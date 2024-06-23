@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Univwork 인증 코드</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 15px; padding: 15px;">
+
+    <div style="max-width: 700px; max-height: 1000px; margin: 0; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <h1 style="color: #333333; font-size: 22px; margin: 0 0 10px; text-decoration: none;">univwork 인증 코드</h1>
+        <br>
+        <p style="color: #555555; font-size: 16px;">아래 코드를 입력해 주세요.</p>
+        <br>
+
+        <div style="border: 1px solid #dddddd; padding: 20px; border-radius: 5px; background-color: #f9f9f9; text-align: center; margin-top: 20px;">
+            <h3 style="color: #007BFF; margin: 0 0 10px;">등록 인증 코드 입니다.</h3>
+            <div style="font-size: 40px; font-weight: bold; color: #333333;" th:text="${code}">123456</div>
+        </div>
+        <br/>
+    </div>
+
+</body>
+</html>
