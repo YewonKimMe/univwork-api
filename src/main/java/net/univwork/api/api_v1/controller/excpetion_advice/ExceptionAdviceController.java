@@ -7,6 +7,8 @@ import net.univwork.api.api_v1.exception.BlockedClientException;
 import net.univwork.api.api_v1.exception.NoUserCodeException;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -86,6 +88,20 @@ public class ExceptionAdviceController {
     }
 
     /**
+     * API 예외처리 핸들러_BadCredentialsException
+     * @param e BadCredentialsException
+     * @return ErrorResultAndMessage
+     * @apiNote 인증 실패 시 발생
+     * @see net.univwork.api.api_v1.security.CustomAuthenticationProvider#authenticate(Authentication) 
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ErrorResultAndMessage badCredential(BadCredentialsException e) {
+        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
      * API 예외처리 핸들러_범용_RuntimeException
      * @param e RuntimeException
      * @return ErrorResultAndMessage
@@ -97,5 +113,12 @@ public class ExceptionAdviceController {
     public ErrorResultAndMessage runtimeException(RuntimeException e) {
         log.debug("RuntimeException={}", e.getMessage());
         return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    public ErrorResultAndMessage internalServerError(Exception e) {
+        log.debug("Exception={}", e.getMessage());
+        return new ErrorResultAndMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), e.getMessage());
     }
 }
