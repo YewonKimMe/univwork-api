@@ -1,4 +1,4 @@
-package net.univwork.api.api_v1.filter;
+package net.univwork.api.api_v1.security.customfilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
