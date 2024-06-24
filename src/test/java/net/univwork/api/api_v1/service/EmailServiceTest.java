@@ -15,6 +15,6 @@ class EmailServiceTest {
 
     @Test
     void sendEmail() throws MessagingException {
-        emailService.sendEmail("mimms1410@naver.com", emailService.createVerifyCode());
+        emailService.sendEmail("mimms1410@naver.com", emailService.createVerifyCode(), "http://localhost:8080");
     }
 }
