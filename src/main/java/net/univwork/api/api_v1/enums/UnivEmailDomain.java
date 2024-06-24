@@ -5,7 +5,7 @@ import net.univwork.api.api_v1.exception.UnivEmailNotFountException;
 
 @Getter
 public enum UnivEmailDomain {
-    GNU("gun.ac.kr", "경상국립대학교");
+    GNU("gun.ac.kr", "경상국립대학교(본교) 학부");
 
     private final String domain;
 
@@ -19,7 +19,7 @@ public enum UnivEmailDomain {
     public static String checkDomainFromString(String univDomainParam) {
         for (UnivEmailDomain emailDomain : values()) {
             if (emailDomain.getDomain().equals(univDomainParam)) {
-                return emailDomain.getDomain();
+                return emailDomain.getUnivName();
             }
         }
         throw new UnivEmailNotFountException("존재하지 않는 학교 도메인 입니다.");
