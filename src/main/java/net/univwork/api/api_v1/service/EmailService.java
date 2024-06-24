@@ -27,8 +27,7 @@ public class EmailService {
     private String senderMailAddress;
 
     @Async
-    public void sendEmail(String receiverEmailAddress) throws MessagingException {
-        String code = createVerifyCode();
+    public void sendEmail(String receiverEmailAddress, String code) throws MessagingException {
         MimeMessage message = emailSender.createMimeMessage();
         message.setFrom(senderMailAddress);
         message.addRecipients(MimeMessage.RecipientType.TO, receiverEmailAddress);
@@ -43,7 +42,7 @@ public class EmailService {
         return templateEngine.process("emailTemplate", context);
     }
 
-    private String createVerifyCode() {
+    public String createVerifyCode() {
         Random random = new Random();
         int code = 100000 + random.nextInt(900000); // 100000부터 999999까지의 범위 무작위 정수 생성
         return String.valueOf(code);
