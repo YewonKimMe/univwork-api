@@ -2,6 +2,7 @@ package net.univwork.api.api_v1.domain.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 /**
  * SuccessResultAndMessage<br>
@@ -9,10 +10,10 @@ import lombok.Data;
  * String message
  * */
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SuccessResultAndMessage {
 
-    private String HttpCode;
+    private final String HttpCode;
 
-    private String message;
+    private final String message;
 }
