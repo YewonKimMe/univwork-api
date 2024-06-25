@@ -34,7 +34,9 @@ public class SignUpController {
     public ResponseEntity<SuccessResultAndMessage> signUp(
             @Validated @RequestBody SignUpFormDto signUpFormDto,
             BindingResult bindingResult) {
+
         log.debug("SignUpFormDto={}", signUpFormDto.toString());
+
         if (bindingResult.hasErrors()) {
             StringBuilder sb = new StringBuilder();
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
@@ -44,16 +46,18 @@ public class SignUpController {
             }
             throw new IllegalArgumentException(sb.toString());
         }
+
         String findUserId = redisService.find(signUpFormDto.getId());
         String findUserEmail = redisService.find(signUpFormDto.getEmail());
+
         log.debug("Redis Checked FindUserId={}", findUserId);
         log.debug("Redis Checked FindUserEmail={}", findUserEmail);
 
         if (null == findUserId) {
-            throw new IllegalArgumentException("아이디가 검증된 입력값과 일치하지 않습니다.");
+            throw new IllegalArgumentException("아이디(ID)가 검증된 입력값과 일치하지 않습니다.");
         }
         if (null == findUserEmail) {
-            throw new IllegalArgumentException("이메일이 검증된 입력값과 일치하지 않습니다.");
+            throw new IllegalArgumentException("이메일(Email)이 검증된 입력값과 일치하지 않습니다.");
         }
 
         singUpService.createUser(signUpFormDto);
@@ -66,6 +70,9 @@ public class SignUpController {
             @Validated @RequestBody SignUpIdDto idDto,
             BindingResult bindingResult
     ) {
+
+        log.debug("SingUpIdDto={}", idDto.toString());
+
         if (bindingResult.hasErrors()) {
             String defaultMessage = bindingResult.getFieldError().getDefaultMessage();
             throw new IllegalArgumentException(defaultMessage);
@@ -85,8 +92,10 @@ public class SignUpController {
     @PostMapping("/email-check")
     public ResponseEntity<SuccessResultAndMessage> emailDuplicateCheck(
             @Validated @RequestBody SignUpEmailDto emailDto,
-            BindingResult bindingResult
-    ) {
+            BindingResult bindingResult) {
+
+        log.debug("SignUpEmailDto={}", emailDto.toString());
+
         if (bindingResult.hasErrors()) {
             String defaultMessage = bindingResult.getFieldError().getDefaultMessage();
             throw new IllegalArgumentException(defaultMessage);
@@ -111,7 +120,7 @@ public class SignUpController {
         // redisService 에서 authToken 으로 이메일을 찾아오고
         String email = redisService.find(authToken);
         if (email == null) {
-            String errorMessage = "Authentication Token 이 유효하지 않습니다.";
+            String errorMessage = "인증키가 유효하지 않거나 인증 만료시간이 초과했습니다.";
 
             return null;
         }
