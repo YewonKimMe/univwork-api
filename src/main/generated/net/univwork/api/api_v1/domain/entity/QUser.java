@@ -34,6 +34,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath userId = createString("userId");
 
+    public final BooleanPath verification = createBoolean("verification");
+
     public QUser(String variable) {
         super(User.class, forVariable(variable));
     }

@@ -3,14 +3,16 @@ package net.univwork.api.api_v1.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -31,8 +33,12 @@ public class User {
     @Column(name = "create_date")
     private Timestamp createDate;
 
+    private boolean verification;
+
     @JsonIgnore
     @OneToMany(mappedBy="user", fetch=FetchType.EAGER)
     private Set<Authority> authorities;
+
+
 
 }
