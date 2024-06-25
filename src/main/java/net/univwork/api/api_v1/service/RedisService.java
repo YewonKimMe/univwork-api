@@ -38,4 +38,9 @@ public class RedisService {
     public void delete(String key) {
         stringRedisTemplate.delete(key);
     }
+
+    public void saveIfAbsent(String key, String value, long timeout, TimeUnit timeUnit) {
+        ValueOperations<String, String> valueOps = stringRedisTemplate.opsForValue();
+        valueOps.setIfAbsent(key, value, timeout, timeUnit);
+    }
 }
