@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.thymeleaf.context.Context;
@@ -26,19 +27,39 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String senderMailAddress;
 
+    private final Environment environment;
+
     @Async
-    public void sendEmail(String receiverEmailAddress, String code) throws MessagingException {
+    public void sendVerifyEmail(String receiverEmailAddress, String authToken) {
+
+        String host = environment.getProperty("email.verify.path.host");
+        String url = environment.getProperty("email.verify.path.url");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(host);
+        sb.append(url);
+        sb.append("?");
+        sb.append("auth-token=");
+        sb.append(authToken);
+        String verifyLink = sb.toString();
+
+        log.debug("verifyLink={}", verifyLink);
         MimeMessage message = emailSender.createMimeMessage();
-        message.setFrom(senderMailAddress);
-        message.addRecipients(MimeMessage.RecipientType.TO, receiverEmailAddress);
-        message.setSubject("[univwork.net 인증코드] " + code); // 이메일 제목
-        message.setText(setContext(code), StandardCharsets.UTF_8.name().toLowerCase(), "html");
+        try {
+            message.setFrom(senderMailAddress);
+            message.addRecipients(MimeMessage.RecipientType.TO, receiverEmailAddress);
+            message.setSubject("[univwork 메일 인증]"); // 이메일 제목
+            message.setText(setContext(verifyLink), StandardCharsets.UTF_8.name().toLowerCase(), "html");
+        } catch (MessagingException e) {
+            throw new RuntimeException(e.getMessage());
+        }
         emailSender.send(message);
     }
 
-    private String setContext(String code) {
+    private String setContext(String link) {
         Context context = new Context();
-        context.setVariable("code", code);
+        context.setVariable("link", link);
+        context.setVariable("subLink", link);
         return templateEngine.process("emailTemplate", context);
     }
 
