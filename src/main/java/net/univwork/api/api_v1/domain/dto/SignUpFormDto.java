@@ -4,14 +4,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class SignUpFormDto {
 
     @NotBlank(message = "아이디를 확인해 주세요.")
-    private String userId;
+    private String id;
 
     @NotBlank(message = "비밀번호를 확인해 주세요.")
     @Size(min = 8, max = 16, message = "비밀번호는 8자 이상 16자 이하로 입력해 주세요.")
