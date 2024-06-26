@@ -16,7 +16,7 @@ public class SignUpFormDto {
 
     @NotBlank(message = "비밀번호를 확인해 주세요.")
     @Size(min = 8, max = 16, message = "비밀번호는 8자 이상 16자 이하로 입력해 주세요.")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$", message = "비밀번호는 최소 8자 이상이며, 영문자와 숫자를 포함해야 합니다.")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#]{8,}$", message = "비밀번호는 최소 8자 이상으로, 영문자와 숫자를 포함해야 하며, 선택적으로 !, @, # 중 하나를 포함할 수 있습니다.")
     private String password;
 
     @Size(max = 8)
