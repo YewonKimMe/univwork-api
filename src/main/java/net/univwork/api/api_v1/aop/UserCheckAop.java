@@ -69,17 +69,17 @@ public class UserCheckAop {
 
         // 반복하여 등록했을 경우
         if (CookieUtils.checkCookie(request, CookieName.REPEAT_REQUEST)) {
-            throw new NoRepeatException("짧은 시간 내에 반복하여 등록하실 수 없습니다. 잠시 후 다시 시도해 주세요.");
+            throw new NoRepeatException("짧은 시간 내에 반복하여 요청 할 수 없습니다. 잠시 후 다시 시도해 주세요.");
         }
 
 
-        // 유저 검증 로직
-        String userNameUuidCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
-        BlockedUser blockedUser = blockedService.findBlockedUser(userNameUuidCookie);
-        if (blockedUser != null && blockedUser.getBlockedUser().equals(userNameUuidCookie)) {
-            //setBlockCookie(response); // 사전 차단용 쿠키를 세팅
-            throw new BlockedClientException("blocked user uuid");
-        }
+//        // 유저 검증 로직
+//        String userNameUuidCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
+//        BlockedUser blockedUser = blockedService.findBlockedUser(userNameUuidCookie);
+//        if (blockedUser != null && blockedUser.getBlockedUser().equals(userNameUuidCookie)) {
+//            //setBlockCookie(response); // 사전 차단용 쿠키를 세팅
+//            throw new BlockedClientException("blocked user uuid");
+//        }
 
         // IP 주소 검증 로직
         String userIpAddr = IpTool.getIpAddr(request);
@@ -90,7 +90,7 @@ public class UserCheckAop {
         }
 
         // 반복 등록 방지용 쿠키 생성
-        //setRepeatCookie(response);
+        setRepeatCookie(response);
         return joinPoint.proceed();
     }
 
@@ -103,9 +103,9 @@ public class UserCheckAop {
     }
 
     private void setRepeatCookie(HttpServletResponse response) {
-        // 반복 등록 방지용 쿠키 생성
+        // 반복 요청 방지용 쿠키 생성
         Cookie cookie = new Cookie(CookieName.REPEAT_REQUEST.getCookieName(), UUID.randomUUID().toString().replaceAll("-", "."));
-        cookie.setMaxAge((int) TimeUnit.SECONDS.toSeconds(20));
+        cookie.setMaxAge((int) TimeUnit.SECONDS.toSeconds(5));
         cookie.setPath("/");
         response.addCookie(cookie);
     }
