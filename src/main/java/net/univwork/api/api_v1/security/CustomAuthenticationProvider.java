@@ -35,7 +35,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         String pwd = authentication.getCredentials().toString();
 
-        User user = userRepository.findUserByEmail(username).orElseThrow(() -> new BadCredentialsException(badCredentialsMessage));
+        User user = userRepository.findUserByUserId(username).orElseThrow(() -> new BadCredentialsException(badCredentialsMessage));
 
         if (passwordEncoder.matches(pwd, user.getPwd())) {
             return new UsernamePasswordAuthenticationToken(username, pwd, getGrantedAuthorities(user.getAuthorities()));
