@@ -2,10 +2,14 @@ package net.univwork.api.api_v1.domain.entity;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "authorities")
 public class Authority {
 
@@ -16,7 +20,7 @@ public class Authority {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_no")
     private User user;
 
     public void setId(Long id) {
