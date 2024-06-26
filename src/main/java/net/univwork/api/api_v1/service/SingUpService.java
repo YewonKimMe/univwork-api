@@ -10,7 +10,6 @@ import net.univwork.api.api_v1.enums.UnivEmailDomain;
 import net.univwork.api.api_v1.exception.EmailAlreadyExistException;
 import net.univwork.api.api_v1.exception.UserAlreadyExistException;
 import net.univwork.api.api_v1.exception.UserNotExistException;
-import net.univwork.api.api_v1.repository.jpa.JpaAuthorityRepository;
 import net.univwork.api.api_v1.repository.jpa.JpaUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,8 +29,6 @@ public class SingUpService {
     private final EmailService emailService;
 
     private final JpaUserRepository userRepository;
-
-    private final JpaAuthorityRepository authorityRepository;
 
     private final RedisService redisService;
 
