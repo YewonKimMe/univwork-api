@@ -36,9 +36,7 @@ public class User {
     private boolean verification;
 
     @JsonIgnore
-    @OneToMany(mappedBy="user", fetch=FetchType.EAGER)
+    @OneToMany(mappedBy="user", fetch=FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Authority> authorities;
-
-
 
 }
