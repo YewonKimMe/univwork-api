@@ -111,6 +111,7 @@ public class SingUpService {
         }
     }
 
+    @Transactional
     public EmailVerificationDto verify(final String authToken) {
 
         log.debug("authToken={}", authToken);
