@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
@@ -39,7 +40,7 @@ public class JwtTokenValidatorFilter extends OncePerRequestFilter {
                         .parseSignedClaims(jwt)// Front 에서 전송한 jwt, 기존 비밀키와 일치 여부 확인, 일치하지 않으면 exception 발생
                         .getPayload();
                 // username, authorities 획득
-                String username = String.valueOf(claims.get("email"));
+                String username = String.valueOf(claims.get("id"));
                 String authorities = (String) claims.get("authorities");
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(username, null,
@@ -54,9 +55,11 @@ public class JwtTokenValidatorFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // JwtTokenValidatorFilter 는 토큰을 검증하는 필터로 로그인 상황에서는 토큰이 없으므로 실행되지 말아야 함.
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        // 임시 설정
-        return request.getServletPath().equals("/api/v1/admin"); // url 이 user 인 경우에 실행하지 않음, 즉 로그인 과정에서 실행 X
+        String path = request.getServletPath();
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+        return pathMatcher.match("/api/v1/login/**", path); // 로그인 과정에서 실행 X
     }
 }
