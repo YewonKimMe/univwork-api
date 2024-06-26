@@ -54,10 +54,10 @@ public class SignUpController {
         log.debug("Redis Checked FindUserEmail={}", findUserEmail);
 
         if (null == findUserId) {
-            throw new IllegalArgumentException("아이디(ID)가 검증된 입력값과 일치하지 않습니다.");
+            throw new IllegalArgumentException("아이디(ID) 중복 확인이 필요합니다.");
         }
         if (null == findUserEmail) {
-            throw new IllegalArgumentException("이메일(Email)이 검증된 입력값과 일치하지 않습니다.");
+            throw new IllegalArgumentException("이메일(Email) 중복 확인이 필요합니다.");
         }
 
         singUpService.createUser(signUpFormDto);
@@ -117,18 +117,11 @@ public class SignUpController {
 
     @GetMapping("/verify-univ-email-address")
     public ResponseEntity<EmailVerificationDto> verifyEmailAddress(@RequestParam(name = "auth-token") String authToken) {
-        // redisService 에서 authToken 으로 이메일을 찾아오고
-        String email = redisService.find(authToken);
-        if (email == null) {
-            String errorMessage = "인증키가 유효하지 않거나 인증 만료시간이 초과했습니다.";
 
-            return null;
-        }
-        // 찾은 이메일로 User 의 verify = 1 설정 후, User 획득
+        EmailVerificationDto verifyResult = singUpService.verify(authToken);
 
-        // 획득한 User 의 로그인 아이디와 이메일을 dto에 매핑 후, redisService 에서 key 삭제
+        log.debug("verifyResult={}", verifyResult);
 
-        // 반환
-        return null;
+        return new ResponseEntity<>(verifyResult, HttpStatus.OK);
     }
 }
