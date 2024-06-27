@@ -20,4 +20,5 @@ public interface JpaWorkplaceCommentRepository extends JpaRepository<WorkplaceCo
     @Query("SELECT wc FROM WorkplaceComment wc WHERE wc.univCode = :univCode AND wc.workplaceCode = :workplaceCode AND wc.deleteFlag = false ORDER BY wc.timestamp DESC")
     Page<WorkplaceComment> getWorkplaceComments(Pageable pageable, @Param("univCode") Long univCode, @Param("workplaceCode") Long workplaceCode);
 
+    int countWorkplaceCommentsByUserIdAndUnivCodeAndWorkplaceCode(String userId, Long univCode, Long workplaceCode);
 }
