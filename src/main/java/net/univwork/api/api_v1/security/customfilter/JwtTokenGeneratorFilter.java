@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.security.SecurityConstants;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +24,7 @@ import java.util.*;
 /**
  * JWT Token 생성 필터, BasicAuthenticationFilter 의 인증 과정이 끝난 이후 Jwt token 을 생성하고 응답에 보내기 위한 필터
  * */
+@Slf4j
 public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
 
     @Override
@@ -45,6 +47,7 @@ public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
                     .signWith(secretKey)
                     .compact(); // jwt 생성
 
+            log.debug("JWT 생성={}", jwt);
             response.setHeader(SecurityConstants.JWT_HEADER, jwt);
         }
         filterChain.doFilter(request, response);
@@ -58,7 +61,10 @@ public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
         AntPathMatcher pathMatcher = new AntPathMatcher();
-        return !pathMatcher.match("/api/v1/login/**", path);
+        log.debug("request path = {}", path);
+        log.debug("pathMatcher Result={}", pathMatcher.match("/api/v1/login", path));
+        // TODO
+        return !pathMatcher.match("/api/v1/login", path);
     }
 
     private String populateAuthorities(Collection<? extends GrantedAuthority> collections) {
