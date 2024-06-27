@@ -17,7 +17,8 @@ public class SwaggerConfig {
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth", new SecurityScheme().type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
-                                .bearerFormat("JWT"))
+                                .bearerFormat("JWT")
+                                .in(SecurityScheme.In.HEADER).name("Authorization"))
                         .addSecuritySchemes("basicAuth",
                                 new SecurityScheme().type(SecurityScheme.Type.HTTP)
                                         .scheme("basic")))
