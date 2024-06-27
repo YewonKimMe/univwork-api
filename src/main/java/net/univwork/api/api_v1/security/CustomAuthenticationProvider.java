@@ -48,7 +48,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             log.debug("로그인 성공, ID={}", username);
             return new UsernamePasswordAuthenticationToken(username, pwd, getGrantedAuthorities(user.getAuthorities()));
         }
-
+        log.debug("로그인 실패");
         throw new BadCredentialsException(badCredentialsMessage);
     }
 
