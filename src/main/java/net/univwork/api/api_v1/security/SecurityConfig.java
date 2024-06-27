@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.enums.Role;
 import net.univwork.api.api_v1.security.customfilter.AuthorityLoggingFilterAfter;
-import net.univwork.api.api_v1.security.customfilter.CsrfCookieFilter;
 import net.univwork.api.api_v1.security.customfilter.JwtTokenGeneratorFilter;
 import net.univwork.api.api_v1.security.customfilter.JwtTokenValidatorFilter;
 import org.springframework.context.annotation.Bean;
@@ -70,8 +69,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((request) -> request
                         .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.getRole())
                         .requestMatchers("/api/v1/user/**").hasAnyRole(Role.USER.getRole(), Role.ADMIN.getRole())
+                        .requestMatchers("/api/v1/login").permitAll()
                         .requestMatchers("/api/**", "/**").permitAll())
-                .formLogin(Customizer.withDefaults())
+                //.formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
         return http.build();
     }
