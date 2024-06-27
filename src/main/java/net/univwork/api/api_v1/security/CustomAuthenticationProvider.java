@@ -1,6 +1,7 @@
 package net.univwork.api.api_v1.security;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.entity.Authority;
 import net.univwork.api.api_v1.domain.entity.User;
 import net.univwork.api.api_v1.repository.jpa.JpaUserRepository;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
@@ -36,8 +38,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String pwd = authentication.getCredentials().toString();
 
         User user = userRepository.findUserByUserId(username).orElseThrow(() -> new BadCredentialsException(badCredentialsMessage));
+        log.debug("findUser={}", user.toString());
+        if (!user.isVerification()) {
+            log.debug("이메일 인증이 필요합니다. 아이디={}", username);
+            throw new BadCredentialsException("최초 이메일 인증 이후에 로그인이 가능합니다.");
+        }
 
         if (passwordEncoder.matches(pwd, user.getPwd())) {
+            log.debug("로그인 성공, ID={}", username);
             return new UsernamePasswordAuthenticationToken(username, pwd, getGrantedAuthorities(user.getAuthorities()));
         }
 
