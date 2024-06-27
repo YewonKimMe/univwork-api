@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.security.SecurityConstants;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,12 +24,21 @@ import java.nio.charset.StandardCharsets;
 /**
  * Jwt token 검증 필터, 인증 로직 전에 수행
  * */
+@Slf4j
 public class JwtTokenValidatorFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // jwt 요청 헤더에서 획득
         String jwt = request.getHeader(SecurityConstants.JWT_HEADER);
+
+        log.debug("jwt={}", jwt);
+
+        if (jwt != null && jwt.contains("Bearer ")) { // swagger 호환 설정
+            jwt = jwt.replace("Bearer ", "");
+        }
+        log.debug("after replace jwt={}", jwt);
+
         if (jwt != null) { // jwt != null 인 경우, 즉 로그인 한 사용자
             try {
                 // 기존 비밀키 생성
