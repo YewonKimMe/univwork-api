@@ -1,9 +1,7 @@
 package net.univwork.api.api_v1.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.sql.Timestamp;
 
@@ -11,6 +9,9 @@ import java.sql.Timestamp;
 @Setter
 @Builder
 @Table(name = "workplace_comment")
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 @Entity
 public class WorkplaceComment {
 
@@ -39,11 +40,8 @@ public class WorkplaceComment {
     @Column
     private int upvote;
 
-    @Column
-    private String nickname;
-
-    @Column
-    private String password;
+    @Column(name = "user_id")
+    private String userId;
 
     @Column
     private Timestamp timestamp;
@@ -57,27 +55,4 @@ public class WorkplaceComment {
     @Column
     private String userIp;
 
-    @Column
-    private byte[] author;
-
-    public WorkplaceComment() {
-    }
-
-    public WorkplaceComment(Long commentCode, Long univCode, Long workplaceCode, String workplaceName, String univName, byte[] comment_uuid, String comment, int upvote, String nickname, String password, Timestamp timestamp, boolean deleteFlag, boolean reportFlag, String userIp, byte[] author) {
-        this.commentCode = commentCode;
-        this.univCode = univCode;
-        this.workplaceCode = workplaceCode;
-        this.workplaceName = workplaceName;
-        this.univName = univName;
-        this.comment_uuid = comment_uuid;
-        this.comment = comment;
-        this.upvote = upvote;
-        this.nickname = nickname;
-        this.password = password;
-        this.timestamp = timestamp;
-        this.deleteFlag = deleteFlag;
-        this.reportFlag = reportFlag;
-        this.userIp = userIp;
-        this.author = author;
-    }
 }
