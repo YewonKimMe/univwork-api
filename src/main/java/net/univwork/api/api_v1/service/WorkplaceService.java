@@ -15,11 +15,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,16 +59,17 @@ public class WorkplaceService {
      * @return CommentDto 페이지 객체
      * @see net.univwork.api.api_v1.repository.WorkplaceRepository#getWorkplaceComments(Pageable, Long, Long)
      * */
-    public Page<CommentDto> getWorkplaceComments(final Long univCode, final Long workplaceCode, final int pageNumber, final int pageLimit) {
+    public Page<CommentDto> getWorkplaceComments(final Long univCode, final Long workplaceCode, final int pageNumber, final int pageLimit, Authentication authentication) {
 
-        // pageable 객체 생성
-        Pageable pageable = PageRequest.of(pageNumber, pageLimit);
+        Pageable pageable = PageRequest.of(pageNumber, pageLimit); // pageable 객체 생성
 
-        // WorkplaceComment 페이지를 가져옴
-        Page<WorkplaceComment> workplaceComments = repository.getWorkplaceComments(pageable, univCode, workplaceCode);
+        Page<WorkplaceComment> workplaceComments = repository.getWorkplaceComments(pageable, univCode, workplaceCode); // WorkplaceComment 페이지를 가져옴
 
-        // Dto로 매핑
-        List<CommentDto> commentDtoList = workplaceComments.getContent().stream()
+        if (authentication == null) { // 인증 객체가 null 일 경우, 즉 비 로그인 (jwt 토큰 없음)
+            return new PageImpl<>(Collections.EMPTY_LIST, pageable, workplaceComments.getTotalElements());
+        }
+
+        List<CommentDto> commentDtoList = workplaceComments.getContent().stream()// Dto로 매핑
                 .map(CommentDto::new)
                 .collect(Collectors.toList());
         // 새 페이지로 반환
@@ -91,19 +94,13 @@ public class WorkplaceService {
      * @return CommentDto 페이지 객체
      * @see net.univwork.api.api_v1.repository.WorkplaceRepository#saveWorkplaceComment(WorkplaceComment) 
      * */
-    public CommentDto saveWorkplaceComment(CommentFormDto commentFormDto, final Long univCode, final Long workplaceCode, final String userIp, final String userCookieUuid) {
+    public CommentDto saveWorkplaceComment(CommentFormDto commentFormDto, final Long univCode, final Long workplaceCode, final String userIp, final Authentication authentication) {
 
         // 근로지 우선 획득(학교 이름 필요)
         Workplace findWorkplace = getWorkplace(univCode, workplaceCode);
 
         // commentUUID를 바이트배열로 변경
         byte[] commentUuidByte = UUIDConverter.convertUuidToBinary16();
-
-        // userCookie uuid를 바이트배열로 변경
-        byte[] userCookieByte = UUIDConverter.convertUuidStringToBinary16(userCookieUuid);
-
-        // 비밀번호 해싱
-        String hashedPw = passwordEncoder.encode(commentFormDto.getPassword());
 
         // WorkplaceComment 생성
         WorkplaceComment workplaceComment = WorkplaceComment.builder()
@@ -113,18 +110,16 @@ public class WorkplaceService {
                 .univName(findWorkplace.getUnivName())
                 .comment_uuid(commentUuidByte)
                 .comment(xssGuard.process(commentFormDto.getComment()))
-                .nickname(commentFormDto.getNickname())
-                .password(hashedPw)
+                .userId(authentication.getName())
                 .timestamp(new Timestamp(System.currentTimeMillis()))
                 .deleteFlag(false)
                 .reportFlag(false)
                 .userIp(userIp)
-                .author(userCookieByte)
                 .build();
 
         // commnent 저장
         WorkplaceComment comment = repository.saveWorkplaceComment(workplaceComment);
-
+        log.debug("saved comment={}", comment);
         // CommentDto로 변환해서 반환
         return new CommentDto(comment); // 나중에 MapStruct 쓰자
     }
