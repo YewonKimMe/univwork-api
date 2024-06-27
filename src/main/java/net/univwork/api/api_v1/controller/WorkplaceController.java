@@ -13,13 +13,14 @@ import net.univwork.api.api_v1.domain.dto.CommentFormDto;
 import net.univwork.api.api_v1.domain.dto.WorkplaceDetailDto;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.enums.CookieName;
+import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.service.WorkplaceService;
-import net.univwork.api.api_v1.tool.CookieUtils;
 import net.univwork.api.api_v1.tool.IpTool;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -43,7 +44,7 @@ public class WorkplaceController {
      * @param pageNumber 페이지 번호
      * @param pageLimit 페이지 당 요소 수
      * @see net.univwork.api.api_v1.service.WorkplaceService#getWorkplace(Long, Long)
-     * @see net.univwork.api.api_v1.service.WorkplaceService#getWorkplaceComments(Long, Long, int, int)
+     * @see net.univwork.api.api_v1.service.WorkplaceService#getWorkplaceComments(Long, Long, int, int, Authentication) 
      * @see net.univwork.api.api_v1.domain.dto.WorkplaceDetailDto
      * WorkplaceDetailDto: 응답 리턴 복합 객체(workplace, commentPage)
      * @since 1.0.0
@@ -61,7 +62,8 @@ public class WorkplaceController {
             @PathVariable(name = "univ-code") final Long univCode,
             @PathVariable(name = "workplace-code") final Long workplaceCode,
             @RequestParam(name = "page-number", defaultValue = "0") final int pageNumber,
-            @RequestParam(name = "page-limit", defaultValue = "10") final int pageLimit) {
+            @RequestParam(name = "page-limit", defaultValue = "10") final int pageLimit,
+            Authentication authentication) {
 
         // 근로지 조회수 1 증가
         service.updateView(univCode, workplaceCode);
@@ -70,7 +72,7 @@ public class WorkplaceController {
         Workplace workplace = service.getWorkplace(univCode, workplaceCode);
 
         // 근로지 댓글 페이지 획득
-        Page<CommentDto> workplaceComments = service.getWorkplaceComments(univCode, workplaceCode, pageNumber, pageLimit);
+        Page<CommentDto> workplaceComments = service.getWorkplaceComments(univCode, workplaceCode, pageNumber, pageLimit, authentication);
 
         // 복합 객체 생성
         WorkplaceDetailDto workplaceDetailDto = new WorkplaceDetailDto(workplace, workplaceComments);
@@ -84,7 +86,7 @@ public class WorkplaceController {
      * @param workplaceCode 근로지 코드
      * @see IpTool#getIpAddr()
      * @see net.univwork.api.api_v1.tool.CookieUtils#getUserCookie(HttpServletRequest, CookieName)
-     * @see net.univwork.api.api_v1.service.WorkplaceService#saveWorkplaceComment(CommentFormDto, Long, Long, String, String)
+     * @see net.univwork.api.api_v1.service.WorkplaceService#saveWorkplaceComment(CommentFormDto, Long, Long, String, Authentication) 
      * @since 1.0.0
      * @return CommentDto
      * */
@@ -99,7 +101,12 @@ public class WorkplaceController {
             BindingResult bindingResult,
             @PathVariable(name = "univ-code") final Long univCode,
             @PathVariable(name = "workplace-code") final Long workplaceCode,
-            HttpServletRequest request) {
+            HttpServletRequest request,
+            Authentication authentication) {
+
+        if (null == authentication) { // 인증 정보가 없을 경우 댓글 작성 불가능
+            throw new NoAuthenticationException("로그인 정보가 없습니다.");
+        }
 
         if (bindingResult.hasErrors()) { // binding 결과에 오류가 있을 경우
             StringBuilder errorMessage = new StringBuilder(); // 오류 메세지 StringBuilder 생성
@@ -117,16 +124,15 @@ public class WorkplaceController {
         if (!univCode.equals(comment.getUnivCode()) || !workplaceCode.equals(comment.getWorkplaceCode())) {
             throw new IllegalArgumentException("근로지 댓글 등록 과정에서 오류가 발생하였습니다.");
         }
+
         // 정상 처리 로직
         // 작성자 IP 획득
         String ipAddr = IpTool.getIpAddr(request);
 
-        // 유저 쿠키 정보 획득
-        String userCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
-
         // 댓글 저장 후, 리턴하기 위해 CommentDto 형식으로 반환
-        CommentDto commentDto = service.saveWorkplaceComment(comment, univCode, workplaceCode, ipAddr, userCookie);
+        CommentDto commentDto = service.saveWorkplaceComment(comment, univCode, workplaceCode, ipAddr, authentication);
 
-        return new ResponseEntity<>(commentDto, HttpStatus.OK);
+        log.debug("Saved And return CommentDto={}", commentDto);
+        return ResponseEntity.ok(commentDto);
     }
 }
