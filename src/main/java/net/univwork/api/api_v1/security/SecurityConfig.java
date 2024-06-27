@@ -64,12 +64,13 @@ public class SecurityConfig {
                 // jwt generation
                 .addFilterAfter(new JwtTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 // logging, 인증 절차가 종료된 직후 바로 실행(로그인 성공);
-                .addFilterAt(new AuthorityLoggingFilterAfter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthorityLoggingFilterAfter(), BasicAuthenticationFilter.class)
                 // url path matcher
                 .authorizeHttpRequests((request) -> request
                         .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.getRole())
                         .requestMatchers("/api/v1/user/**").hasAnyRole(Role.USER.getRole(), Role.ADMIN.getRole())
-                        .requestMatchers("/api/v1/login").permitAll()
+                        .requestMatchers("/api/v1/login/**").permitAll()
+                        .requestMatchers("/api/v1/sign-up/**").permitAll()
                         .requestMatchers("/api/**", "/**").permitAll())
                 //.formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
