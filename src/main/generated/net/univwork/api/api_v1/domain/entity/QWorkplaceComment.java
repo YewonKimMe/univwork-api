@@ -19,8 +19,6 @@ public class QWorkplaceComment extends EntityPathBase<WorkplaceComment> {
 
     public static final QWorkplaceComment workplaceComment = new QWorkplaceComment("workplaceComment");
 
-    public final ArrayPath<byte[], Byte> author = createArray("author", byte[].class);
-
     public final StringPath comment = createString("comment");
 
     public final ArrayPath<byte[], Byte> comment_uuid = createArray("comment_uuid", byte[].class);
@@ -28,10 +26,6 @@ public class QWorkplaceComment extends EntityPathBase<WorkplaceComment> {
     public final NumberPath<Long> commentCode = createNumber("commentCode", Long.class);
 
     public final BooleanPath deleteFlag = createBoolean("deleteFlag");
-
-    public final StringPath nickname = createString("nickname");
-
-    public final StringPath password = createString("password");
 
     public final BooleanPath reportFlag = createBoolean("reportFlag");
 
@@ -42,6 +36,8 @@ public class QWorkplaceComment extends EntityPathBase<WorkplaceComment> {
     public final StringPath univName = createString("univName");
 
     public final NumberPath<Integer> upvote = createNumber("upvote", Integer.class);
+
+    public final StringPath userId = createString("userId");
 
     public final StringPath userIp = createString("userIp");
 
