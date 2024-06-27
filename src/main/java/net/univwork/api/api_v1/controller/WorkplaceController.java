@@ -13,6 +13,7 @@ import net.univwork.api.api_v1.domain.dto.CommentFormDto;
 import net.univwork.api.api_v1.domain.dto.WorkplaceDetailDto;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.enums.CookieName;
+import net.univwork.api.api_v1.exception.DuplicationException;
 import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.service.WorkplaceService;
 import net.univwork.api.api_v1.tool.IpTool;
@@ -108,6 +109,10 @@ public class WorkplaceController {
             throw new NoAuthenticationException("로그인 정보가 없습니다.");
         }
 
+        if (service.countUserComments(authentication, univCode, workplaceCode) > 0) { // 같은 근로지 중복 작성 방지
+            throw new DuplicationException("이미 같은 근로지에 작성한 댓글이 존재합니다. 근로지 당 하나의 댓글만 작성할 수 있습니다.");
+        }
+
         if (bindingResult.hasErrors()) { // binding 결과에 오류가 있을 경우
             StringBuilder errorMessage = new StringBuilder(); // 오류 메세지 StringBuilder 생성
             List<FieldError> fieldErrors = bindingResult.getFieldErrors(); // 필드 에러를 가져와서
@@ -120,19 +125,17 @@ public class WorkplaceController {
             throw new IllegalArgumentException(String.valueOf(errorMessage)); // IllgalArg 예외 던짐
         }
 
-        // PathVariable 과 CommentDto 의 univCode, workplaceCode 가 같지 않은 경우, 조작된 상황
-        if (!univCode.equals(comment.getUnivCode()) || !workplaceCode.equals(comment.getWorkplaceCode())) {
+        if (!univCode.equals(comment.getUnivCode()) || !workplaceCode.equals(comment.getWorkplaceCode())) { // PathVariable 과 CommentDto 의 univCode, workplaceCode 가 같지 않은 경우, 조작된 상황
             throw new IllegalArgumentException("근로지 댓글 등록 과정에서 오류가 발생하였습니다.");
         }
 
-        // 정상 처리 로직
-        // 작성자 IP 획득
-        String ipAddr = IpTool.getIpAddr(request);
+        // ---------- 정상 처리 로직 ------------
+        String ipAddr = IpTool.getIpAddr(request); // 작성자 IP 획득
 
-        // 댓글 저장 후, 리턴하기 위해 CommentDto 형식으로 반환
-        CommentDto commentDto = service.saveWorkplaceComment(comment, univCode, workplaceCode, ipAddr, authentication);
+        CommentDto commentDto = service.saveWorkplaceComment(comment, univCode, workplaceCode, ipAddr, authentication); // 댓글 저장 후, 리턴하기 위해 CommentDto 형식으로 반환
 
         log.debug("Saved And return CommentDto={}", commentDto);
+
         return ResponseEntity.ok(commentDto);
     }
 }
