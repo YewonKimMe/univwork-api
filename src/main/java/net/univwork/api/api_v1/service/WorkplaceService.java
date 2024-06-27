@@ -123,4 +123,9 @@ public class WorkplaceService {
         // CommentDto로 변환해서 반환
         return new CommentDto(comment); // 나중에 MapStruct 쓰자
     }
+
+    public int countUserComments(Authentication authentication, final Long univCode, final Long workplaceCode) {
+        String userId = authentication.getName();
+        return repository.countUserComments(userId, univCode, workplaceCode);
+    }
 }

@@ -71,4 +71,9 @@ public class WorkplaceRepositoryImpl implements WorkplaceRepository{
         em.persist(comment);
         return comment;
     }
+
+    @Override
+    public int countUserComments(final String userId, final Long univCode, final Long workplaceCode) {
+        return jpaWorkplaceCommentRepository.countWorkplaceCommentsByUserIdAndUnivCodeAndWorkplaceCode(userId, univCode, workplaceCode);
+    }
 }
