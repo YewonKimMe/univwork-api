@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "University", description = "학교 관련 기능")
+@Tag(name = "University", description = "Univ 관련 기능 엔드포인트")
 @RestController
 @RequestMapping(value = "/api/v1/universities", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UnivController {
