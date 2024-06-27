@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,7 @@ public class WorkplaceController {
      * @since 1.0.0
      * @return WorkplaceDetaiolDto: [Workplace + Page&lt;CommentDto&gt;]<br>근로지 정보와 댓글을 복합객체로 리턴
      * */
-    @Operation(summary = "근로지 정보 획득", description = "근로지 정보와 근로지 댓글을 최신순으로 가져오는 API")
+    @Operation(summary = "근로지 정보 획득", description = "근로지 정보와 근로지 댓글을 최신순으로 가져오는 엔드포인트")
     @Parameters({
             @Parameter(name = "univ-code", description = "학교 코드", in = ParameterIn.PATH),
             @Parameter(name = "workplace-code", description = "근로지 코드", in = ParameterIn.PATH),
@@ -91,7 +92,7 @@ public class WorkplaceController {
      * @since 1.0.0
      * @return CommentDto
      * */
-    @Operation(summary = "근로지 댓글 등록", description = "근로지 댓글 입력값 유효성 검사 및 등록 처리")
+    @Operation(summary = "근로지 댓글 등록", description = "근로지 댓글 입력값 유효성 검사 및 등록을 처리하는 엔드포인트", security = {@SecurityRequirement(name = "bearerAuth")})
     @Parameters({
             @Parameter(name = "univ-code", description = "학교 코드", in = ParameterIn.PATH),
             @Parameter(name = "workplace-code", description = "근로지 코드", in = ParameterIn.PATH)
