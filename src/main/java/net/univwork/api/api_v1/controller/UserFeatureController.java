@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.CommentDto;
 import net.univwork.api.api_v1.domain.dto.PasswordChangeDto;
+import net.univwork.api.api_v1.domain.dto.PasswordDto;
 import net.univwork.api.api_v1.domain.dto.UserDetailDto;
 import net.univwork.api.api_v1.domain.response.ErrorResultAndMessage;
 import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.domain.response.SuccessResultAndMessage;
 import net.univwork.api.api_v1.exception.PasswordNotMatchException;
+import net.univwork.api.api_v1.exception.UserNotExistException;
 import net.univwork.api.api_v1.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -40,6 +44,9 @@ public class UserFeatureController {
 
     @GetMapping("/my-comments")
     public ResponseEntity<Page<CommentDto>> getUserComments(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return null;
     }
 
@@ -64,11 +71,25 @@ public class UserFeatureController {
         if (changeRow == 1) { // 정상적으로 변경되어 변경된 행이 1일 경우
             return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "비밀번호가 변경되었습니다."));
         }
-        throw new BadCredentialsException("유저 인증정보가 올바르지 않습니다."); // 유저가 존재하지 않는 경우, 변경된 row 가 0
+        throw new BadCredentialsException("유저 인증정보가 올바르지 않아 비밀번호를 변경하지 못했습니다."); // 유저가 존재하지 않는 경우, 변경된 row 가 0
     }
 
     @DeleteMapping("/withdrawal")
-    public ResponseEntity<SuccessResultAndMessage> deleteUser(Authentication authentication) {
-        return null;
+    public ResponseEntity<ResultAndMessage> deleteUser(
+            @Validated @RequestBody PasswordDto passwordDto,
+            BindingResult bindingResult,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (bindingResult.hasFieldErrors()) {
+            String fieldErrorMessage = bindingResult.getFieldError().getDefaultMessage();
+            return ResponseEntity.badRequest().body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), fieldErrorMessage));
+        }
+        int changeRow = userService.withdraw(authentication.getName(), passwordDto.getPassword());
+        if (changeRow == 1) {
+            return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "계정이 삭제되었습니다."));
+        }
+        throw new UserNotExistException("인증 정보가 유효하지 않거나, 이미 삭제된 계정입니다.");
     }
 }
