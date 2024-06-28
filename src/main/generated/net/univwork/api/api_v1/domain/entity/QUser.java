@@ -32,6 +32,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath role = createString("role");
 
+    public final StringPath univDomain = createString("univDomain");
+
     public final StringPath userId = createString("userId");
 
     public final BooleanPath verification = createBoolean("verification");
