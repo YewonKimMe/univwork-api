@@ -12,5 +12,5 @@ public interface UserRepository {
 
     int updatePassword(String userId, String newPassword);
 
-    void withdraw(String userId);
+    int withdraw(String userId);
 }
