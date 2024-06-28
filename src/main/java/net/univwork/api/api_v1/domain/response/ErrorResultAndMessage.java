@@ -10,7 +10,7 @@ import lombok.Data;
  * */
 @Data
 @AllArgsConstructor
-public class ErrorResultAndMessage {
+public class ErrorResultAndMessage implements ResultAndMessage{
 
     private String HttpCode;
 

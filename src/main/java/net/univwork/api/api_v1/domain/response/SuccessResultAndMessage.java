@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
  * */
 @Data
 @RequiredArgsConstructor
-public class SuccessResultAndMessage {
+public class SuccessResultAndMessage implements ResultAndMessage{
 
     private final String HttpCode;
 
