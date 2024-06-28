@@ -83,4 +83,18 @@ public class UserService {
         }
     }
 
+    public int withdraw(final String userId, final String userInputPwd) {
+        Optional<User> findUserOpt = userRepository.findUserByUserId(userId);
+        if (findUserOpt.isEmpty()) {
+            log.error("USER ID does not exist - parameter userId={}", userId);
+            throw new UserNotExistException("ID로 검색된 유저가 존재하지 않습니다.");
+        }
+        User user = findUserOpt.get();
+        if (passwordEncoder.matches(userInputPwd, user.getPwd())) {
+            log.info("유저 계정 삭제 처리: userId={}, email={}", userId, user.getEmail());
+            return userRepository.withdraw(userId);
+        }
+        throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+    }
+
 }
