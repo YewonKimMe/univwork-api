@@ -36,6 +36,9 @@ public class User {
 
     private boolean verification;
 
+    @Column(name = "univ_domain")
+    private String univDomain;
+
     @JsonIgnore
     @OneToMany(mappedBy="user", fetch=FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Authority> authorities;
