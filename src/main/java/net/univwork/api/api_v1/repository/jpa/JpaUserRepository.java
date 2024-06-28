@@ -34,5 +34,5 @@ public interface JpaUserRepository extends JpaRepository<User, Long> {
     /**
      * 탈퇴
      */
-    void deleteUserByUserId(String userId);
+    int deleteUserByUserId(String userId);
 }
