@@ -37,7 +37,8 @@ public class SingUpService {
     @Transactional
     public void createUser(SignUpFormDto signUpFormDto) {
 
-        String hashedPw = passwordEncoder.encode(signUpFormDto.getPassword());
+        String hashedPw = passwordEncoder.encode(signUpFormDto.getPassword()); // 비밀번호 해싱
+        String userUnivDomain = signUpFormDto.getEmail().split("@")[1]; // 이메일 도메인 획득
 
         // 유저 엔티티 생성
         User user = User.builder()
@@ -47,6 +48,7 @@ public class SingUpService {
                 .role(Role.PREFIX.getRole() + Role.USER.getRole())
                 .createDate(new Timestamp(System.currentTimeMillis()))
                 .verification(false)
+                .univDomain(userUnivDomain)
                 .authorities(new HashSet<>())
                 .build();
 
