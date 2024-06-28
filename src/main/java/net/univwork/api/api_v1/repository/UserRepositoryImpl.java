@@ -31,7 +31,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void withdraw(final String userId) {
-        jpaUserRepository.deleteUserByUserId(userId);
+    public int withdraw(final String userId) {
+        return jpaUserRepository.deleteUserByUserId(userId);
     }
 }
