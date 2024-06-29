@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,6 +26,7 @@ import java.nio.charset.StandardCharsets;
  * Jwt token 검증 필터, 인증 로직 전에 수행
  * */
 @Slf4j
+@Component
 public class JwtTokenValidatorFilter extends OncePerRequestFilter {
 
     @Override

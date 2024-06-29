@@ -11,6 +11,7 @@ import net.univwork.api.api_v1.security.SecurityConstants;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,6 +26,7 @@ import java.util.*;
  * JWT Token 생성 필터, BasicAuthenticationFilter 의 인증 과정이 끝난 이후 Jwt token 을 생성하고 응답에 보내기 위한 필터
  * */
 @Slf4j
+@Component
 public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
 
     @Override
