@@ -1,11 +1,10 @@
 package net.univwork.api.api_v1.security;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.enums.Role;
-import net.univwork.api.api_v1.security.customfilter.AuthorityLoggingFilterAfter;
-import net.univwork.api.api_v1.security.customfilter.JwtTokenGeneratorFilter;
-import net.univwork.api.api_v1.security.customfilter.JwtTokenValidatorFilter;
+import net.univwork.api.api_v1.security.customfilter.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -16,7 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -25,9 +23,23 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
+@AllArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final JwtTokenGeneratorFilter jwtTokenGeneratorFilter;
+
+    private final JwtTokenValidatorFilter jwtTokenValidatorFilter;
+
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
+    private final JwtExceptionHandlerFilter jwtExceptionHandlerFilter;
+
+    private final AuthorityLoggingFilterAfter authorityLoggingFilterAfter;
+
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
@@ -55,24 +67,18 @@ public class SecurityConfig {
                         }))
                 .csrf((csrf) -> csrf.disable())
 //                .csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler)
-//                        // Cookie 로 csrf 토큰 설정, javascript 로 접근 가능
-//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                // jwt validation
-                .addFilterBefore(new JwtTokenValidatorFilter(), BasicAuthenticationFilter.class)
-                // csrf cookie
-                //.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-                // jwt generation
-                .addFilterAfter(new JwtTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-                // logging, 인증 절차가 종료된 직후 바로 실행(로그인 성공);
-                .addFilterAfter(new AuthorityLoggingFilterAfter(), BasicAuthenticationFilter.class)
-                // url path matcher
-                .authorizeHttpRequests((request) -> request
+//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))// Cookie 로 csrf 토큰 설정, javascript 로 접근 가능
+                .addFilterBefore(jwtTokenValidatorFilter, BasicAuthenticationFilter.class) // jwt validation
+                //.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class) // csrf cookie
+                .addFilterAfter(jwtTokenGeneratorFilter, BasicAuthenticationFilter.class) // jwt generation filter
+                .addFilterAfter(authorityLoggingFilterAfter, BasicAuthenticationFilter.class) // logging, 인증 절차가 종료된 직후 바로 실행(로그인 성공);
+                .addFilterBefore(jwtExceptionHandlerFilter, JwtTokenValidatorFilter.class) // jwt validation 과정에서 예외 발생 시 캐치
+                .authorizeHttpRequests((request) -> request // url path matcher
                         .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.getRole())
                         .requestMatchers("/api/v1/user/**").hasAnyRole(Role.USER.getRole(), Role.ADMIN.getRole())
                         .requestMatchers("/api/v1/login/**").permitAll()
                         .requestMatchers("/api/v1/sign-up/**").permitAll()
                         .requestMatchers("/api/**", "/**").permitAll())
-                //.formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
         return http.build();
     }
