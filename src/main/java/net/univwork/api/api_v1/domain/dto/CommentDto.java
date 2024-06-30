@@ -19,7 +19,7 @@ public class CommentDto {
 
     private String univName;
 
-    private String comment_uuid; //Dto에서는 기존 entity의 byte16을 String으로 변환해서 저장
+    private String commentUuid; //Dto에서는 기존 entity의 byte16을 String으로 변환해서 저장
 
     private String comment;
 
@@ -41,7 +41,7 @@ public class CommentDto {
         this.workplaceCode = workplaceComment.getWorkplaceCode();
         this.workplaceName = workplaceComment.getWorkplaceName();
         this.univName = workplaceComment.getUnivName();
-        this.comment_uuid = UUIDConverter.convertBinary16ToUUID(workplaceComment.getComment_uuid()).toString();
+        this.commentUuid = UUIDConverter.convertBinary16ToUUID(workplaceComment.getCommentUuid()).toString();
         this.comment = workplaceComment.getComment();
         this.upvote = workplaceComment.getUpvote();
         this.timestamp = workplaceComment.getTimestamp();
