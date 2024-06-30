@@ -114,7 +114,7 @@ public class WorkplaceService {
                 .workplaceCode(workplaceCode)
                 .workplaceName(findWorkplace.getWorkplaceName())
                 .univName(findWorkplace.getUnivName())
-                .comment_uuid(commentUuidByte)
+                .commentUuid(commentUuidByte)
                 .comment(xssGuard.process(commentFormDto.getComment()))
                 .userId(authentication.getName())
                 .timestamp(new Timestamp(System.currentTimeMillis()))
