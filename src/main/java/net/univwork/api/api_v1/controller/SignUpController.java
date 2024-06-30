@@ -1,5 +1,8 @@
 package net.univwork.api.api_v1.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.EmailVerificationDto;
@@ -17,11 +20,13 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
+@Tag(name = "Sign Up", description = "회원가입 관련 기능 엔드포인트")
 @Controller
 @RequestMapping("/api/v1/sign-up")
 public class SignUpController {
@@ -30,10 +35,11 @@ public class SignUpController {
 
     private final RedisService redisService;
 
+    @Operation(summary = "회원 등록", description = "회원 등록, 아이디 및 이메일 중복 확인 서브로직 포함")
     @PostMapping("/register")
     public ResponseEntity<SuccessResultAndMessage> signUp(
-            @Validated @RequestBody SignUpFormDto signUpFormDto,
-            BindingResult bindingResult) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "회원 등록 폼") @Validated @RequestBody SignUpFormDto signUpFormDto,
+            @Parameter(hidden = true) BindingResult bindingResult) {
 
         log.debug("SignUpFormDto={}", signUpFormDto.toString());
 
@@ -46,7 +52,7 @@ public class SignUpController {
             }
             throw new IllegalArgumentException(sb.toString());
         }
-
+        // TODO 레디스 확인 로직을 서비스 create 메소드로 옮기기
         String findUserId = redisService.find(signUpFormDto.getId());
         String findUserEmail = redisService.find(signUpFormDto.getEmail());
 
@@ -61,14 +67,16 @@ public class SignUpController {
         }
 
         singUpService.createUser(signUpFormDto);
+
         SuccessResultAndMessage result = new SuccessResultAndMessage(HttpStatus.CREATED.getReasonPhrase(), "계정이 생성되었습니다.");
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "ID Check", description = "아이디 중복 체크, 회원 등록 전 반드시 수행")
     @PostMapping("/id-check")
     public ResponseEntity<SuccessResultAndMessage> idDuplicateCheck(
-            @Validated @RequestBody SignUpIdDto idDto,
-            BindingResult bindingResult
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "ID 객체") @Validated @RequestBody SignUpIdDto idDto,
+            @Parameter(hidden = true) BindingResult bindingResult
     ) {
 
         log.debug("SingUpIdDto={}", idDto.toString());
@@ -89,10 +97,11 @@ public class SignUpController {
         return new ResponseEntity<>(resultAndMessage, HttpStatus.OK);
     }
 
+    @Operation(summary = "Email Check", description = "이메일 중복 체크, 회원 등록 전 반드시 수행")
     @PostMapping("/email-check")
     public ResponseEntity<SuccessResultAndMessage> emailDuplicateCheck(
-            @Validated @RequestBody SignUpEmailDto emailDto,
-            BindingResult bindingResult) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Email 객체") @Validated @RequestBody SignUpEmailDto emailDto,
+            @Parameter(hidden = true) BindingResult bindingResult) {
 
         log.debug("SignUpEmailDto={}", emailDto.toString());
 
@@ -115,11 +124,13 @@ public class SignUpController {
         return new ResponseEntity<>(resultAndMessage, HttpStatus.OK);
     }
 
+    @Operation(summary = "이메일 인증", description = "이메일 인증 엔드포인트, 회원가입 이후에 수행(레디스 이용-48시간 동안 유효)")
     @GetMapping("/verify-univ-email-address")
-    public ResponseEntity<EmailVerificationDto> verifyEmailAddress(@RequestParam(name = "auth-token") String authToken) {
+    public ResponseEntity<EmailVerificationDto> verifyEmailAddress(@Parameter(name = "auth-token") @RequestParam(name = "auth-token") String authToken) {
 
         EmailVerificationDto verifyResult = singUpService.verify(authToken);
 
+        log.info("user email verified, userId={}, email={}, Time={}", verifyResult.getLoginId(), verifyResult.getEmail(), new Timestamp(System.currentTimeMillis()));
         log.debug("verifyResult={}", verifyResult);
 
         return new ResponseEntity<>(verifyResult, HttpStatus.OK);
