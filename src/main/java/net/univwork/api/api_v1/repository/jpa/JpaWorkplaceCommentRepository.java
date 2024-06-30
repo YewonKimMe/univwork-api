@@ -4,8 +4,11 @@ import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
 
 public interface JpaWorkplaceCommentRepository extends JpaRepository<WorkplaceComment, Long> {
 
@@ -21,4 +24,10 @@ public interface JpaWorkplaceCommentRepository extends JpaRepository<WorkplaceCo
     Page<WorkplaceComment> getWorkplaceComments(Pageable pageable, @Param("univCode") Long univCode, @Param("workplaceCode") Long workplaceCode);
 
     int countWorkplaceCommentsByUserIdAndUnivCodeAndWorkplaceCode(String userId, Long univCode, Long workplaceCode);
+
+    @Modifying
+    @Query("UPDATE WorkplaceComment  wc SET wc.reportFlag = true WHERE wc.commentUuid = :commentUuid")
+    int updateReportColumn(@Param("commentUuid") byte[] commentUuid);
+
+    Optional<WorkplaceComment> findWorkplaceCommentByCommentUuid(byte[] commentUuid);
 }
