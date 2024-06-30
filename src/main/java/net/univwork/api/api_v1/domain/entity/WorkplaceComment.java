@@ -31,8 +31,8 @@ public class WorkplaceComment {
     @Column
     private String univName;
 
-    @Column
-    private byte[] comment_uuid; //UUID 가 생성 후 객체에 String type 으로 저장되고 DB에는 16진수 Binary로 저장
+    @Column(name = "comment_uuid")
+    private byte[] commentUuid; //UUID 가 생성 후 객체에 String type 으로 저장되고 DB에는 16진수 Binary로 저장
 
     @Column
     private String comment;
