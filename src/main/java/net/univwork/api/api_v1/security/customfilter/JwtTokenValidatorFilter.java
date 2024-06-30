@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.security.SecurityConstants;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -59,7 +60,8 @@ public class JwtTokenValidatorFilter extends OncePerRequestFilter {
                         AuthorityUtils.commaSeparatedStringToAuthorityList(authorities)); // generator 에서 (,) 로 구별하여 토큰 생성, 여기서는 콤마로 구별된 문자열을 다시 List authorities 로 변경
                 SecurityContextHolder.getContext().setAuthentication(auth); // 인증 절차 완료, contextholder 에 저장
             } catch (Exception e) {
-                throw new BadCredentialsException("유효하지 않은 토큰입니다.");
+                request.setAttribute("exception", e);
+                SecurityContextHolder.clearContext();
             }
 
         }
