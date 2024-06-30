@@ -13,7 +13,6 @@ import net.univwork.api.api_v1.domain.dto.CommentDto;
 import net.univwork.api.api_v1.domain.dto.CommentFormDto;
 import net.univwork.api.api_v1.domain.dto.WorkplaceDetailDto;
 import net.univwork.api.api_v1.domain.entity.Workplace;
-import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.enums.CookieName;
 import net.univwork.api.api_v1.exception.DuplicationException;
 import net.univwork.api.api_v1.exception.NoAuthenticationException;
@@ -41,7 +40,7 @@ import java.util.List;
 @RequestMapping(value = "/api/v1/universities/{univ-code}/workplaces/{workplace-code}", produces = MediaType.APPLICATION_JSON_VALUE)
 public class WorkplaceController {
 
-    private final WorkplaceService service; // 서비스 객체
+    private final WorkplaceService service;
 
     /**
      * getWorkplaceDetail: 근로지 정보와 근로지 댓글을 가져옴
@@ -146,13 +145,5 @@ public class WorkplaceController {
         log.debug("Saved And return CommentDto={}", commentDto);
 
         return ResponseEntity.ok(commentDto);
-    }
-
-    @PatchMapping("/comment")
-    public ResponseEntity<ResultAndMessage> reportComments(
-            @PathVariable(name = "univ-code") final Long univCode,
-            @PathVariable(name = "workplace-code") final Long workplaceCode
-    ) {
-        return null;
     }
 }
