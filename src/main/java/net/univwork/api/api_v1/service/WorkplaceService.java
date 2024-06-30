@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,13 +65,19 @@ public class WorkplaceService {
 
         Page<WorkplaceComment> workplaceComments = repository.getWorkplaceComments(pageable, univCode, workplaceCode); // WorkplaceComment 페이지를 가져옴
 
-        if (authentication == null) { // 인증 객체가 null 일 경우, 즉 비 로그인 (jwt 토큰 없음)
-            return new PageImpl<>(Collections.EMPTY_LIST, pageable, workplaceComments.getTotalElements());
-        }
 
         List<CommentDto> commentDtoList = workplaceComments.getContent().stream()// Dto로 매핑
                 .map(CommentDto::new)
                 .collect(Collectors.toList());
+
+        if (authentication == null || !authentication.isAuthenticated()) { // 인증 객체가 null 일 경우, 즉 비 로그인 (jwt 토큰 없음)
+            List<CommentDto> dummyList = new ArrayList<>();
+            for (CommentDto cmt : commentDtoList) {
+                cmt.setComment("로그인 이후에 근로지 댓글을 확인하실 수 있습니다.");
+                dummyList.add(cmt);
+            }
+            return new PageImpl<>(dummyList, pageable, workplaceComments.getTotalElements());
+        }
         // 새 페이지로 반환
         return new PageImpl<>(commentDtoList, pageable, workplaceComments.getTotalElements());
     }
