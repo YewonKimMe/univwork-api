@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 
 @Getter @Setter
 @ToString
@@ -14,9 +16,9 @@ public class WorkplaceDetailDto {
 
     private Workplace workplace;
 
-    private Page<CommentDto> workplaceComment;
+    private PagedModel<EntityModel<CommentDto>> workplaceComment;
 
-    public WorkplaceDetailDto(Workplace workplace, Page<CommentDto> workplaceComment) {
+    public WorkplaceDetailDto(Workplace workplace, PagedModel<EntityModel<CommentDto>> workplaceComment) {
         this.workplace = workplace;
         this.workplaceComment = workplaceComment;
     }
