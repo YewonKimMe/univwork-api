@@ -21,9 +21,9 @@ public class QWorkplaceComment extends EntityPathBase<WorkplaceComment> {
 
     public final StringPath comment = createString("comment");
 
-    public final ArrayPath<byte[], Byte> comment_uuid = createArray("comment_uuid", byte[].class);
-
     public final NumberPath<Long> commentCode = createNumber("commentCode", Long.class);
+
+    public final ArrayPath<byte[], Byte> commentUuid = createArray("commentUuid", byte[].class);
 
     public final BooleanPath deleteFlag = createBoolean("deleteFlag");
 
