@@ -15,6 +15,7 @@ import net.univwork.api.api_v1.service.UnivService;
 import net.univwork.api.api_v1.tool.ConstString;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
@@ -69,15 +70,16 @@ public class UnivController {
 
     /**
      * getWorkplaces: 학교 별 근로지 리스트 조회 + 검색 + 정렬 메소드
-     * @param univCode 학교 코드(정수),
-     * @param pageNumber 페이지 번호,
-     * @param pageLimit 페이지 당 요소 갯수,
+     *
+     * @param univCode               학교 코드(정수),
+     * @param pageNumber             페이지 번호,
+     * @param pageLimit              페이지 당 요소 갯수,
      * @param workplaceSearchKeyword (선택) 근로지 이름 검색어,
-     * @param sortParam 정렬 옵션: 근로지명 오름차순, 근로지명 내림차순, 조회수 오름차순, 조회수 내림차순, 댓글 오름차순, 댓글 내림차순
+     * @param sortParam              정렬 옵션: 근로지명 오름차순, 근로지명 내림차순, 조회수 오름차순, 조회수 내림차순, 댓글 오름차순, 댓글 내림차순
      * @apiNote 학교 코드가 일치하는 근로지를 획득, 학교 이름으로 세부 검색 및 근로지 이름, 댓글수, 조회수 등으로 오름/내림차순 가능
-     * @since 1.0.0
      * @see net.univwork.api.api_v1.service.UnivService#getWorkplaces(Long, int, int, String, WorkplaceType, SortOption)
-     * */
+     * @since 1.0.0
+     */
     @Operation(summary = "학교 별 근로지 조회", description = "학교별 근로지 조회, 정렬 및 검색 기능 포함")
     @Parameters({
             @Parameter(name = "univ-code", description = "학교 코드(정수)", in = ParameterIn.PATH),
@@ -88,14 +90,14 @@ public class UnivController {
             @Parameter(name = "sort", description = "정렬 옵션<br>workplaceAsc_근로지명 오름차순<br>workplaceDesc_근로지명 내림차순<br>workplaceViewAsc_근로지 조회수 오름차순<br>workplaceViewDesc_근로지 조회수 내림차순<br>workplaceCommentNumAsc_근로지 댓글 오름차순<br>workplaceCommentNumDesc_근로지 댓글 내림차순", in = ParameterIn.QUERY)
     })
     @GetMapping("/{univ-code}/workplaces")
-    public ResponseEntity<PagedModel<Workplace>> getWorkplaces(
+    public ResponseEntity<PagedModel<EntityModel<Workplace>>> getWorkplaces(
             @PathVariable(name = "univ-code") final Long univCode,
             @RequestParam(name = "page-number", defaultValue = "0") final int pageNumber,
             @RequestParam(name = "page-limit", defaultValue = "40") final int pageLimit,
             @RequestParam(name = "workplace-name", required = false) final String workplaceSearchKeyword,
             @RequestParam(name = "workplace-type", required = false) final String workplaceTypeParam,
             @RequestParam(name = "sort", defaultValue = ConstString.WORKPLACE_NAME_ASC) final String sortParam,
-            @Parameter(hidden = true) PagedResourcesAssembler assembler) {
+            @Parameter(hidden = true) PagedResourcesAssembler<Workplace> assembler) {
 
         // 정렬 옵션 enum 획득
         SortOption sortOption = SortOption.fromValue(sortParam);
@@ -105,7 +107,7 @@ public class UnivController {
 
         // 학교 별 근로지 페이지 + 조건 조회
         Page<Workplace> workplacesPage = univService.getWorkplaces(univCode, pageNumber, pageLimit, workplaceSearchKeyword, workplaceType, sortOption);
-        PagedModel model = assembler.toModel(workplacesPage);
+        PagedModel<EntityModel<Workplace>> model = assembler.toModel(workplacesPage);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS))
                 .body(model);
