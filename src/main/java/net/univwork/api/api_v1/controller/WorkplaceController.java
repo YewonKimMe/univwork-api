@@ -13,12 +13,16 @@ import net.univwork.api.api_v1.domain.dto.CommentDto;
 import net.univwork.api.api_v1.domain.dto.CommentFormDto;
 import net.univwork.api.api_v1.domain.dto.WorkplaceDetailDto;
 import net.univwork.api.api_v1.domain.entity.Workplace;
+import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.enums.CookieName;
 import net.univwork.api.api_v1.exception.DuplicationException;
 import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.service.WorkplaceService;
 import net.univwork.api.api_v1.tool.IpTool;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +69,8 @@ public class WorkplaceController {
             @PathVariable(name = "workplace-code") final Long workplaceCode,
             @RequestParam(name = "page-number", defaultValue = "0") final int pageNumber,
             @RequestParam(name = "page-limit", defaultValue = "10") final int pageLimit,
-            Authentication authentication) {
+            @Parameter(hidden = true) Authentication authentication,
+            @Parameter(hidden = true) PagedResourcesAssembler<CommentDto> assembler) {
 
         // 근로지 조회수 1 증가
         service.updateView(univCode, workplaceCode);
@@ -76,8 +81,11 @@ public class WorkplaceController {
         // 근로지 댓글 페이지 획득
         Page<CommentDto> workplaceComments = service.getWorkplaceComments(univCode, workplaceCode, pageNumber, pageLimit, authentication);
 
+        // PagedModel
+        PagedModel<EntityModel<CommentDto>> model = assembler.toModel(workplaceComments);
+
         // 복합 객체 생성
-        WorkplaceDetailDto workplaceDetailDto = new WorkplaceDetailDto(workplace, workplaceComments);
+        WorkplaceDetailDto workplaceDetailDto = new WorkplaceDetailDto(workplace, model);
 
         return new ResponseEntity<>(workplaceDetailDto, HttpStatus.OK);
     }
@@ -138,5 +146,13 @@ public class WorkplaceController {
         log.debug("Saved And return CommentDto={}", commentDto);
 
         return ResponseEntity.ok(commentDto);
+    }
+
+    @PatchMapping("/comment")
+    public ResponseEntity<ResultAndMessage> reportComments(
+            @PathVariable(name = "univ-code") final Long univCode,
+            @PathVariable(name = "workplace-code") final Long workplaceCode
+    ) {
+        return null;
     }
 }
