@@ -36,8 +36,6 @@ public class SecurityConfig {
 
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    private final JwtExceptionHandlerFilter jwtExceptionHandlerFilter;
-
     private final AuthorityLoggingFilterAfter authorityLoggingFilterAfter;
 
     @Bean
@@ -72,13 +70,15 @@ public class SecurityConfig {
                 //.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class) // csrf cookie
                 .addFilterAfter(jwtTokenGeneratorFilter, BasicAuthenticationFilter.class) // jwt generation filter
                 .addFilterAfter(authorityLoggingFilterAfter, BasicAuthenticationFilter.class) // logging, 인증 절차가 종료된 직후 바로 실행(로그인 성공);
-                .addFilterBefore(jwtExceptionHandlerFilter, JwtTokenValidatorFilter.class) // jwt validation 과정에서 예외 발생 시 캐치
                 .authorizeHttpRequests((request) -> request // url path matcher
                         .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.getRole())
                         .requestMatchers("/api/v1/user/**").hasAnyRole(Role.USER.getRole(), Role.ADMIN.getRole())
                         .requestMatchers("/api/v1/login/**").permitAll()
                         .requestMatchers("/api/v1/sign-up/**").permitAll()
                         .requestMatchers("/api/**", "/**").permitAll())
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler))
                 .httpBasic(Customizer.withDefaults());
         return http.build();
     }
