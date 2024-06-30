@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Tag(name = "Comment", description = "댓글 관련 부가 기능")
+@Tag(name = "Comment", description = "댓글 관련 부가 기능 엔드포인트")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/comment")
