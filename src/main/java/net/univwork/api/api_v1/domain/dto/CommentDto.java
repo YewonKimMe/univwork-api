@@ -31,6 +31,10 @@ public class CommentDto {
 
     private boolean reportFlag;
 
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public CommentDto(WorkplaceComment workplaceComment) {
         this.commentCode = workplaceComment.getCommentCode();
         this.univCode = workplaceComment.getUnivCode();
