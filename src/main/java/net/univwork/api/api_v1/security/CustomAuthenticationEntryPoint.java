@@ -25,7 +25,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         log.debug("AuthenticationEntryPoint, unauthenticated request detected");
         Exception e = (Exception) request.getAttribute("exception");
-        log.debug("exception={}", e.getMessage());
+        if (e != null) {
+            log.debug("exception: {}", e.getMessage());
+        }
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
