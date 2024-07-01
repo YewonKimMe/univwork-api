@@ -1,12 +1,19 @@
 package net.univwork.api.api_v1.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.univwork.api.api_v1.domain.dto.CommentReportDto;
+import net.univwork.api.api_v1.domain.entity.ReportedComment;
 import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
+import net.univwork.api.api_v1.enums.ReportReason;
 import net.univwork.api.api_v1.exception.AlreadyReportedException;
+import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.repository.CommentRepository;
+import net.univwork.api.api_v1.repository.ReportedCommentRepository;
+import net.univwork.api.api_v1.tool.IpTool;
 import net.univwork.api.api_v1.tool.UUIDConverter;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,19 +28,52 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void reportComment(String commentUuid) {
-        byte[] commentUuidBytes = UUIDConverter.convertUuidStringToBinary16(commentUuid);
-        Optional<WorkplaceComment> findCommentOpt = commentRepository.findWorkplaceCommentByCommentUuid(commentUuidBytes);
-        if (findCommentOpt.isEmpty()) {
-            log.error("해당 댓글이 존재하지 않습니다, Param UUID = {}", commentUuid);
+    private final ReportedCommentRepository reportedCommentRepository;
+
+    public void reportComment(CommentReportDto reportDto, HttpServletRequest request, Authentication authentication) {
+
+        String reportUserIp = IpTool.getIpAddr(request); // 신고 유저 IP
+        String reportUserId = null;
+
+        if (null != authentication) { // 로그인된 회원일 경우, ID 획득
+            reportUserId = authentication.getName();
+        } else { // 비회원인 경우,
+            log.error("신고 권한이 존재하지 않습니다");
+            throw new NoAuthenticationException("로그인 이후 신고할 수 있습니다.");
+        }
+
+        ReportReason reportReason = ReportReason.fromValue(reportDto.getReason()); // 신고 사유 적합성 검증
+
+        byte[] commentUuidBytes = UUIDConverter.convertUuidStringToBinary16(reportDto.getCommentUuid()); // 댓글 UUID Bytes
+
+        Optional<WorkplaceComment> findCommentOpt = commentRepository.findWorkplaceCommentByCommentUuid(commentUuidBytes); // 댓글 Optional 획득
+
+        if (findCommentOpt.isEmpty()) { // 댓글이 존재하지 않는 경우
+            log.error("해당 댓글이 존재하지 않습니다, Param UUID = {}", reportDto.getCommentUuid());
             throw new IllegalArgumentException("잘못된 댓글 코드입니다.");
         }
-        WorkplaceComment workplaceComment = findCommentOpt.get();
-        if (workplaceComment.isReportFlag()) {
+
+        WorkplaceComment workplaceComment = findCommentOpt.get(); // Entity 획득
+
+        if (workplaceComment.isReportFlag()) { // 이미 신고된 댓글인 경우
             throw new AlreadyReportedException("이미 신고된 댓글입니다.");
         }
-        workplaceComment.setReportFlag(true);
-        log.info("근로지 댓글이 신고되었습니다. UUID: {}, TIME: {}", commentUuid, new Timestamp(System.currentTimeMillis()));
+        workplaceComment.setReportFlag(true); // 신고된 댓글이 아닌 경우, 신고 상태로 전환
+        log.info("근로지 댓글이 신고되었습니다. UUID: {}, TIME: {}", reportDto.getCommentUuid(), new Timestamp(System.currentTimeMillis()));
+
+
+        ReportedComment reportedCommentResult = ReportedComment.builder() // 신고 결과
+                .commentUuid(workplaceComment.getCommentUuid())
+                .reportedUserId(workplaceComment.getUserId())
+                .reportedUserIp(workplaceComment.getUserIp())
+                .comment(workplaceComment.getComment())
+                .reportUserId(reportUserId)
+                .reportUserIp(reportUserIp)
+                .reason(reportReason.getReason())
+                .time(new Timestamp(System.currentTimeMillis()))
+                .inProgress(true)
+                .build();
+
+        reportedCommentRepository.save(reportedCommentResult); // 신고 결과 저장
     }
 }
