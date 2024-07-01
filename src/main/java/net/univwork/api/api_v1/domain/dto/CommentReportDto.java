@@ -9,4 +9,5 @@ import lombok.ToString;
 @ToString
 public class CommentReportDto {
     private String commentUuid;
+    private String reason;
 }
