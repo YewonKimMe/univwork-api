@@ -1,5 +1,7 @@
 package net.univwork.api.api_v1.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +34,9 @@ public class UserFeatureController {
 
     private final UserService userService;
 
+    @Operation(summary = "유저 정보 조회", description = "유저 회원 정보 조회")
     @GetMapping
-    public ResponseEntity<UserDetailDto> getUserInfo(Authentication authentication) {
+    public ResponseEntity<UserDetailDto> getUserInfo(@Parameter(hidden = true) Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -42,18 +45,20 @@ public class UserFeatureController {
         return ResponseEntity.ok().body(userDetail);
     }
 
+    @Operation(summary = "댓글 조회", description = "특정 회원 댓글 조회")
     @GetMapping("/my-comments")
-    public ResponseEntity<Page<CommentDto>> getUserComments(Authentication authentication) {
+    public ResponseEntity<Page<CommentDto>> getUserComments(@Parameter(hidden = true) Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return null;
     }
 
+    @Operation(summary = "비밀번호 변경", description = "비밀번호 변경")
     @PatchMapping("/change-password")
     public ResponseEntity<ResultAndMessage> changePwd(
-            @RequestBody PasswordChangeDto passwordChangeDto,
-            Authentication authentication) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "비밀번호 변경 객체") @RequestBody PasswordChangeDto passwordChangeDto,
+            @Parameter(hidden = true) Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) { // 인증 X
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -74,11 +79,12 @@ public class UserFeatureController {
         throw new BadCredentialsException("유저 인증정보가 올바르지 않아 비밀번호를 변경하지 못했습니다."); // 유저가 존재하지 않는 경우, 변경된 row 가 0
     }
 
+    @Operation(summary = "회원탈퇴", description = "회원탈퇴(Hard Delete)")
     @DeleteMapping("/withdrawal")
     public ResponseEntity<ResultAndMessage> deleteUser(
-            @Validated @RequestBody PasswordDto passwordDto,
-            BindingResult bindingResult,
-            Authentication authentication) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "비밀번호 객체") @Validated @RequestBody PasswordDto passwordDto,
+            @Parameter(hidden = true) BindingResult bindingResult,
+            @Parameter(hidden = true) Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
