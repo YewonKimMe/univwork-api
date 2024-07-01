@@ -52,7 +52,6 @@ public class SignUpController {
             }
             throw new IllegalArgumentException(sb.toString());
         }
-        // TODO 레디스 확인 로직을 서비스 create 메소드로 옮기기
         String findUserId = redisService.find(signUpFormDto.getId());
         String findUserEmail = redisService.find(signUpFormDto.getEmail());
 
