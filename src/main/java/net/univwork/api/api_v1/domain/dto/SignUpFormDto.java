@@ -12,6 +12,7 @@ import lombok.ToString;
 public class SignUpFormDto {
 
     @NotBlank(message = "아이디를 확인해 주세요.")
+    @Size(min = 6, max = 100, message = "아이디는 최소 6자 최대 100자 까지 입력 가능합니다.")
     private String id;
 
     @NotBlank(message = "비밀번호를 확인해 주세요.")
