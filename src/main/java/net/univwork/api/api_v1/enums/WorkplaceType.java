@@ -17,7 +17,7 @@ public enum WorkplaceType {
 
     public static WorkplaceType fromValue(String param) {
         for (WorkplaceType value : values()) {
-            if (param == null) {
+            if (param.equals("all")) {
                 return ALL;
             }
             if (value.getWorkplaceType().equals(param)) {
