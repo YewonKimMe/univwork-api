@@ -67,8 +67,8 @@ public class WorkplaceController {
     public ResponseEntity<WorkplaceDetailDto> getWorkplaceDetail(
             @PathVariable(name = "univ-code") final Long univCode,
             @PathVariable(name = "workplace-code") final Long workplaceCode,
-            @RequestParam(name = "page-number", defaultValue = "0") final int pageNumber,
-            @RequestParam(name = "page-limit", defaultValue = "10") final int pageLimit,
+            @RequestParam(name = "pageNumber", defaultValue = "0") final int pageNumber,
+            @RequestParam(name = "pageLimit", defaultValue = "10") final int pageLimit,
             @Parameter(hidden = true) Authentication authentication,
             @Parameter(hidden = true) PagedResourcesAssembler<CommentDto> assembler) {
 
