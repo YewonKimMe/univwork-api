@@ -1,5 +1,6 @@
 package net.univwork.api.api_v1.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
 import net.univwork.api.api_v1.tool.UUIDConverter;
@@ -25,6 +26,7 @@ public class CommentDto {
 
     private int upvote;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private Timestamp timestamp;
 
     private boolean deleteFlag;
