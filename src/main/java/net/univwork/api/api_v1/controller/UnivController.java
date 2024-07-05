@@ -87,14 +87,14 @@ public class UnivController {
             @Parameter(name = "pageNumber", description = "페이지 숫자, 기본 0, 만약 workplace 으로 검색할 경우 기본값 으로 유지", in = ParameterIn.QUERY),
             @Parameter(name = "pageLimit", description = "한 페이지 당 요소 갯수, 기본 40", in = ParameterIn.QUERY),
             @Parameter(name = "workplaceName", description = "검색 근로지명(선택)", in = ParameterIn.QUERY),
-            @Parameter(name = "workplaceType", description = "근로지 종류(선택), 선택 X 시 교내, 교외 둘 다 획득<br>in 교내근로<br>out 교외근로", in = ParameterIn.QUERY),
+            @Parameter(name = "workplaceType", description = "근로지 종류(선택), all 전체<br>in 교내근로<br>out 교외근로", in = ParameterIn.QUERY),
             @Parameter(name = "sort", description = "정렬 옵션<br>workplaceAsc_근로지명 오름차순<br>workplaceDesc_근로지명 내림차순<br>workplaceViewAsc_근로지 조회수 오름차순<br>workplaceViewDesc_근로지 조회수 내림차순<br>workplaceCommentNumAsc_근로지 댓글 오름차순<br>workplaceCommentNumDesc_근로지 댓글 내림차순", in = ParameterIn.QUERY)
     })
     @GetMapping("/{univ-code}/workplaces")
     public ResponseEntity<PagedModel<EntityModel<Workplace>>> getWorkplaces(
             @PathVariable(name = "univ-code") final Long univCode,
-            @RequestParam(name = "pageNumber", defaultValue = "0") final int pageNumber,
-            @RequestParam(name = "pageLimit", defaultValue = "40") final int pageLimit,
+            @RequestParam(name = "page", defaultValue = "0") final int pageNumber,
+            @RequestParam(name = "size", defaultValue = "40") final int pageLimit,
             @RequestParam(name = "workplaceName", required = false) final String workplaceSearchKeyword,
             @RequestParam(name = "workplaceType", required = false) final String workplaceTypeParam,
             @RequestParam(name = "sort", defaultValue = ConstString.WORKPLACE_NAME_ASC) final String sortParam,
