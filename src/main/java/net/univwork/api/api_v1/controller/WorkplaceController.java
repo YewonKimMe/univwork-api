@@ -60,15 +60,15 @@ public class WorkplaceController {
     @Parameters({
             @Parameter(name = "univ-code", description = "학교 코드", in = ParameterIn.PATH),
             @Parameter(name = "workplace-code", description = "근로지 코드", in = ParameterIn.PATH),
-            @Parameter(name = "page-number", description = "페이지 번호, 기본 0", in = ParameterIn.QUERY),
-            @Parameter(name = "page-limit", description = "페이지 당 댓글 갯수, 기본 10", in = ParameterIn.QUERY)
+            @Parameter(name = "page", description = "페이지 번호, 기본 0", in = ParameterIn.QUERY),
+            @Parameter(name = "size", description = "페이지 당 댓글 갯수, 기본 10", in = ParameterIn.QUERY)
     })
     @GetMapping
     public ResponseEntity<WorkplaceDetailDto> getWorkplaceDetail(
             @PathVariable(name = "univ-code") final Long univCode,
             @PathVariable(name = "workplace-code") final Long workplaceCode,
-            @RequestParam(name = "pageNumber", defaultValue = "0") final int pageNumber,
-            @RequestParam(name = "pageLimit", defaultValue = "10") final int pageLimit,
+            @RequestParam(name = "page", defaultValue = "0") final int pageNumber,
+            @RequestParam(name = "size", defaultValue = "10") final int pageLimit,
             @Parameter(hidden = true) Authentication authentication,
             @Parameter(hidden = true) PagedResourcesAssembler<CommentDto> assembler) {
 
