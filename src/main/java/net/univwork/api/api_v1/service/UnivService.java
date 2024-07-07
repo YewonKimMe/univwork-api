@@ -3,6 +3,7 @@ package net.univwork.api.api_v1.service;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.univwork.api.api_v1.domain.dto.WorkplaceSummaryDto;
 import net.univwork.api.api_v1.domain.entity.University;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.enums.SortOption;
@@ -52,5 +53,21 @@ public class UnivService {
         Pageable pageable = PageRequest.of(pageNumber, pageLimit);
 
         return univRepository.getWorkplaces(pageable, univCode, workplaceName, workplaceType, sortOption);
+    }
+
+    /**
+     * getWorkplacesSummary: 학교별 근로지 요약정보들을 반환, 정렬 및 검색 가능(근로지 페이지에서 추가 검색 고려)
+     * @param univCode 학교 코드(정수_임시)
+     * @param pageNumber 페이지 숫자
+     * @param pageLimit 한 페이지 당 갯수
+     * @param workplaceName @Nullable 근로지 검색어
+     * @param sortOption 정렬 옵션
+     * */
+    public Page<WorkplaceSummaryDto> getWorkplacesSummary(final Long univCode, final int pageNumber, final int pageLimit, @Nullable final String workplaceName, final WorkplaceType workplaceType, final SortOption sortOption){
+
+        // Controller에서 넘겨 받은 pageNumber, pageLimit 으로 pageable 생성
+        Pageable pageable = PageRequest.of(pageNumber, pageLimit);
+
+        return univRepository.getWorkplacesSummary(pageable, univCode, workplaceName, workplaceType, sortOption);
     }
 }
