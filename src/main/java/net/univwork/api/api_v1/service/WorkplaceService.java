@@ -71,11 +71,9 @@ public class WorkplaceService {
                 .collect(Collectors.toList());
 
         if (authentication == null || !authentication.isAuthenticated()) { // 인증 객체가 null 일 경우, 즉 비 로그인 (jwt 토큰 없음)
-            List<CommentDto> dummyList = new ArrayList<>();
-            for (CommentDto cmt : commentDtoList) {
-                cmt.setComment("로그인 이후에 근로지 댓글을 확인하실 수 있습니다.");
-                dummyList.add(cmt);
-            }
+            List<CommentDto> dummyList = commentDtoList.stream()
+                    .peek(cmt -> cmt.setComment("로그인 후 근로지 댓글을 확인하실 수 있습니다."))
+                    .collect(Collectors.toList());
             return new PageImpl<>(dummyList, pageable, workplaceComments.getTotalElements());
         }
         // 새 페이지로 반환
