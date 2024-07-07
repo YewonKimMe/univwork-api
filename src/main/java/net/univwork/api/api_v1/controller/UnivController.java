@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.univwork.api.api_v1.domain.dto.WorkplaceSummaryDto;
 import net.univwork.api.api_v1.domain.entity.University;
-import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.enums.SortOption;
 import net.univwork.api.api_v1.enums.WorkplaceType;
 import net.univwork.api.api_v1.service.UnivService;
@@ -91,14 +91,14 @@ public class UnivController {
             @Parameter(name = "sort", description = "정렬 옵션<br>workplaceAsc_근로지명 오름차순<br>workplaceDesc_근로지명 내림차순<br>workplaceViewAsc_근로지 조회수 오름차순<br>workplaceViewDesc_근로지 조회수 내림차순<br>workplaceCommentNumAsc_근로지 댓글 오름차순<br>workplaceCommentNumDesc_근로지 댓글 내림차순", in = ParameterIn.QUERY)
     })
     @GetMapping("/{univ-code}/workplaces")
-    public ResponseEntity<PagedModel<EntityModel<Workplace>>> getWorkplaces(
+    public ResponseEntity<PagedModel<EntityModel<WorkplaceSummaryDto>>> getWorkplaces(
             @PathVariable(name = "univ-code") final Long univCode,
             @RequestParam(name = "page", defaultValue = "0") final int pageNumber,
             @RequestParam(name = "size", defaultValue = "40") final int pageLimit,
             @RequestParam(name = "workplaceName", required = false) final String workplaceSearchKeyword,
             @RequestParam(name = "workplaceType", required = false, defaultValue = "all") final String workplaceTypeParam,
             @RequestParam(name = "sort", defaultValue = ConstString.WORKPLACE_NAME_ASC) final String sortParam,
-            @Parameter(hidden = true) PagedResourcesAssembler<Workplace> assembler) {
+            @Parameter(hidden = true) PagedResourcesAssembler<WorkplaceSummaryDto> assembler) {
 
         // 정렬 옵션 enum 획득
         SortOption sortOption = SortOption.fromValue(sortParam);
@@ -107,8 +107,8 @@ public class UnivController {
         WorkplaceType workplaceType = WorkplaceType.fromValue(workplaceTypeParam);
 
         // 학교 별 근로지 페이지 + 조건 조회
-        Page<Workplace> workplacesPage = univService.getWorkplaces(univCode, pageNumber, pageLimit, workplaceSearchKeyword, workplaceType, sortOption);
-        PagedModel<EntityModel<Workplace>> model = assembler.toModel(workplacesPage);
+        Page<WorkplaceSummaryDto> workplacesPage = univService.getWorkplacesSummary(univCode, pageNumber, pageLimit, workplaceSearchKeyword, workplaceType, sortOption);
+        PagedModel<EntityModel<WorkplaceSummaryDto>> model = assembler.toModel(workplacesPage);
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS))
                 .body(model);
