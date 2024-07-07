@@ -78,7 +78,7 @@ public class UnivController {
      * @param workplaceSearchKeyword (선택) 근로지 이름 검색어,
      * @param sortParam              정렬 옵션: 근로지명 오름차순, 근로지명 내림차순, 조회수 오름차순, 조회수 내림차순, 댓글 오름차순, 댓글 내림차순
      * @apiNote 학교 코드가 일치하는 근로지를 획득, 학교 이름으로 세부 검색 및 근로지 이름, 댓글수, 조회수 등으로 오름/내림차순 가능
-     * @see net.univwork.api.api_v1.service.UnivService#getWorkplaces(Long, int, int, String, WorkplaceType, SortOption)
+     * @see net.univwork.api.api_v1.service.UnivService#getWorkplacesSummary(Long, int, int, String, WorkplaceType, SortOption)
      * @since 1.0.0
      */
     @Operation(summary = "학교 별 근로지 조회", description = "학교별 근로지 조회, 정렬 및 검색 기능 포함")
