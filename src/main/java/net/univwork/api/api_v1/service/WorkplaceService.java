@@ -66,17 +66,16 @@ public class WorkplaceService {
         Page<WorkplaceComment> workplaceComments = repository.getWorkplaceComments(pageable, univCode, workplaceCode); // WorkplaceComment 페이지를 가져옴
 
 
-        List<CommentDto> commentDtoList = workplaceComments.getContent().stream()// Dto로 매핑
-                .map(CommentDto::new)
+        List<CommentDto> commentDtoList = workplaceComments.getContent().stream()
+                .map(comment -> {
+                    CommentDto dto = new CommentDto(comment);
+                    if (authentication == null || !authentication.isAuthenticated()) {
+                        dto.setComment("로그인 후 근로지 댓글을 확인하실 수 있습니다.");
+                    }
+                    return dto;
+                })
                 .collect(Collectors.toList());
 
-        if (authentication == null || !authentication.isAuthenticated()) { // 인증 객체가 null 일 경우, 즉 비 로그인 (jwt 토큰 없음)
-            List<CommentDto> dummyList = commentDtoList.stream()
-                    .peek(cmt -> cmt.setComment("로그인 후 근로지 댓글을 확인하실 수 있습니다."))
-                    .collect(Collectors.toList());
-            return new PageImpl<>(dummyList, pageable, workplaceComments.getTotalElements());
-        }
-        // 새 페이지로 반환
         return new PageImpl<>(commentDtoList, pageable, workplaceComments.getTotalElements());
     }
 
