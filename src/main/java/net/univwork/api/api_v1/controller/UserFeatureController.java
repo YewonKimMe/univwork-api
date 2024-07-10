@@ -12,6 +12,7 @@ import net.univwork.api.api_v1.domain.dto.UserDetailDto;
 import net.univwork.api.api_v1.domain.response.ErrorResultAndMessage;
 import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.domain.response.SuccessResultAndMessage;
+import net.univwork.api.api_v1.exception.DuplicationException;
 import net.univwork.api.api_v1.exception.PasswordNotMatchException;
 import net.univwork.api.api_v1.exception.UserNotExistException;
 import net.univwork.api.api_v1.service.UserService;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "UserFeature", description = "로그인 유저 기능 관련 엔드 포인트")
 @RestController
-@RequestMapping(value = "/api/v1/user", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/users", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserFeatureController {
 
     private final UserService userService;
@@ -59,21 +60,27 @@ public class UserFeatureController {
     public ResponseEntity<ResultAndMessage> changePwd(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "비밀번호 변경 객체") @RequestBody PasswordChangeDto passwordChangeDto,
             @Parameter(hidden = true) Authentication authentication) {
+
         if (authentication == null || !authentication.isAuthenticated()) { // 인증 X
+            log.debug("인증 미존재");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         if (!passwordChangeDto.getNewPwd().equals(passwordChangeDto.getNewPwdCheck())) { // 비밀번호 확인 일치 X
+            log.debug("비밀번호 확인 일치 X");
             throw new PasswordNotMatchException("비밀번호 확인이 일치하지 않습니다.");
         }
 
         int changeRow = userService.updateUserPassword(authentication.getName(), passwordChangeDto.getCurrentPwd(), passwordChangeDto.getNewPwd());
 
         if (changeRow == -1) { // 기존 비밀번호와 새 비밀번호가 동일한 경우
-            return ResponseEntity.badRequest().body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), "기존 비밀번호와 새 비밀번호가 동일합니다."));
+            log.debug("기존 비밀번호 == 새 비밀번호");
+            throw new DuplicationException("기존 비밀번호와 새 비밀번호가 동일합니다.");
+            //return ResponseEntity.badRequest().body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), "기존 비밀번호와 새 비밀번호가 동일합니다."));
         }
 
         if (changeRow == 1) { // 정상적으로 변경되어 변경된 행이 1일 경우
+            log.debug("비밀번호 변경 완료");
             return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "비밀번호가 변경되었습니다."));
         }
         throw new BadCredentialsException("유저 인증정보가 올바르지 않아 비밀번호를 변경하지 못했습니다."); // 유저가 존재하지 않는 경우, 변경된 row 가 0
