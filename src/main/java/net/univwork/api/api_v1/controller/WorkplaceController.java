@@ -88,7 +88,7 @@ public class WorkplaceController {
         WorkplaceDetailDto workplaceDetailDto = new WorkplaceDetailDto(workplace, model);
 
         return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS))
+                .cacheControl(CacheControl.maxAge(3, TimeUnit.SECONDS))
                 .body(workplaceDetailDto);
     }
 
@@ -121,7 +121,7 @@ public class WorkplaceController {
         }
 
         if (service.countUserComments(authentication, univCode, workplaceCode) > 0) { // 같은 근로지 중복 작성 방지
-            throw new DuplicationException("이미 같은 근로지에 작성한 댓글이 존재합니다. 근로지 당 하나의 댓글만 작성할 수 있습니다.");
+            throw new DuplicationException("이미 같은 근로지에 작성한 댓글이 존재합니다.\n근로지 당 하나의 댓글만 작성할 수 있습니다.");
         }
 
         if (bindingResult.hasErrors()) { // binding 결과에 오류가 있을 경우
