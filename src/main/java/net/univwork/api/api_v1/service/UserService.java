@@ -72,6 +72,7 @@ public class UserService {
         
         User user = findUserOpt.get();
         if (passwordEncoder.matches(rawNewPwd, user.getPwd())) { // 유저가 입력한 새 pwd와 DB의 기존 pwd(Hashed) 가 같으면
+            log.debug("기존 비밀번호와 새 비밀번호가 일치함");
             return sameAsExistPwdCode;
         }
         
@@ -79,7 +80,7 @@ public class UserService {
             log.info("User Pwd Changed - userId={}", userId);
             return userRepository.updatePassword(userId, passwordEncoder.encode(rawNewPwd));
         } else { // 유저 입력 비밀번호 != DB 유저 비밀번호
-            throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+            throw new PasswordNotMatchException("현재 비밀번호가 일치하지 않습니다.");
         }
     }
 
