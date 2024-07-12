@@ -39,7 +39,7 @@ public class EmailService {
         sb.append(host);
         sb.append(url);
         sb.append("?");
-        sb.append("auth-token=");
+        sb.append("authToken=");
         sb.append(authToken);
         String verifyLink = sb.toString();
 
