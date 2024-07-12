@@ -124,8 +124,8 @@ public class SignUpController {
     }
 
     @Operation(summary = "이메일 인증", description = "이메일 인증 엔드포인트, 회원가입 이후에 수행(레디스 이용-48시간 동안 유효)")
-    @GetMapping("/verify-univ-email-address")
-    public ResponseEntity<EmailVerificationDto> verifyEmailAddress(@Parameter(name = "auth-token") @RequestParam(name = "auth-token") String authToken) {
+    @PatchMapping("/verify-univ-email-address")
+    public ResponseEntity<EmailVerificationDto> verifyEmailAddress(@Parameter(name = "authToken") @RequestParam(name = "authToken") String authToken) {
 
         EmailVerificationDto verifyResult = singUpService.verify(authToken);
 
