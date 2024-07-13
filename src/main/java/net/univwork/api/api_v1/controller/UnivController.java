@@ -7,9 +7,11 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.univwork.api.api_v1.domain.dto.UnivEmailDomainDto;
 import net.univwork.api.api_v1.domain.dto.WorkplaceSummaryDto;
 import net.univwork.api.api_v1.domain.entity.University;
 import net.univwork.api.api_v1.enums.SortOption;
+import net.univwork.api.api_v1.enums.UnivEmailDomain;
 import net.univwork.api.api_v1.enums.WorkplaceType;
 import net.univwork.api.api_v1.service.UnivService;
 import net.univwork.api.api_v1.tool.ConstString;
@@ -22,7 +24,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -112,5 +117,16 @@ public class UnivController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS))
                 .body(model);
+    }
+
+    @Operation(summary = "근로지 후기 지원 학교 리스트", description = "현재 근로지가 추가된 학교 리스트 엔드 포인트")
+    @GetMapping("/possible-univ-lists")
+    public ResponseEntity<List<UnivEmailDomainDto>> getPossibleUniversities() {
+        List<UnivEmailDomainDto> collect = Arrays.stream(UnivEmailDomain.values()).map(univEmailDomain -> new UnivEmailDomainDto(univEmailDomain.getDomain(), univEmailDomain.getUnivName()))
+                .toList();
+        log.debug("list={}", collect);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS))
+                .body(collect);
     }
 }
