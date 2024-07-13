@@ -19,6 +19,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,7 +55,10 @@ public class SecurityConfig {
                             @Override
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration config = new CorsConfiguration();
-                                config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                                config.setAllowedOrigins(Arrays.asList(
+                                        "http://localhost:3000",
+                                        "https://univwork.pages.dev"
+                                ));
                                 config.setAllowedMethods(Collections.singletonList("*"));
                                 config.setAllowCredentials(true);
                                 config.setAllowedHeaders(Collections.singletonList("*"));
@@ -72,7 +76,7 @@ public class SecurityConfig {
                 .addFilterAfter(authorityLoggingFilterAfter, BasicAuthenticationFilter.class) // logging, 인증 절차가 종료된 직후 바로 실행(로그인 성공);
                 .authorizeHttpRequests((request) -> request // url path matcher
                         .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.getRole())
-                        .requestMatchers("/api/v1/user/**").hasAnyRole(Role.USER.getRole(), Role.ADMIN.getRole())
+                        .requestMatchers("/api/v1/users/**").hasAnyRole(Role.USER.getRole(), Role.ADMIN.getRole())
                         .requestMatchers("/api/v1/login/**").permitAll()
                         .requestMatchers("/api/v1/sign-up/**").permitAll()
                         .requestMatchers("/api/**", "/**").permitAll())
