@@ -63,7 +63,7 @@ public class UserFeatureController {
 
         if (authentication == null || !authentication.isAuthenticated()) { // 인증 X
             log.debug("인증 미존재");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResultAndMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase(), "인증 정보가 존재하지 않습니다."));
         }
 
         if (!passwordChangeDto.getNewPwd().equals(passwordChangeDto.getNewPwdCheck())) { // 비밀번호 확인 일치 X
