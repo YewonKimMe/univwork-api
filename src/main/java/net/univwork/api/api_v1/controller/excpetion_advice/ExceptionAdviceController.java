@@ -3,8 +3,7 @@ package net.univwork.api.api_v1.controller.excpetion_advice;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.response.ErrorResultAndMessage;
-import net.univwork.api.api_v1.exception.BlockedClientException;
-import net.univwork.api.api_v1.exception.NoUserCodeException;
+import net.univwork.api.api_v1.exception.*;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -102,23 +101,140 @@ public class ExceptionAdviceController {
     }
 
     /**
+     * API 예외처리 PasswordNotMatchException
+     * @param e PasswordNotMatchException
+     * @return ErrorResultAndMessage
+     * @apiNote 비밀번호 불일치
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(PasswordNotMatchException.class)
+    public ErrorResultAndMessage passwordNotMatches(PasswordNotMatchException e) {
+        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
+     * API 예외처리 DuplicationException
+     * @param e DuplicationException
+     * @return ErrorResultAndMessage
+     * @apiNote DuplicationException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DuplicationException.class)
+    public ErrorResultAndMessage duplication(DuplicationException e) {
+        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
+     * API 예외처리 NoRepeatException
+     * @param e NoRepeatException
+     * @return ErrorResultAndMessage
+     * @apiNote NoRepeatException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NoRepeatException.class)
+    public ErrorResultAndMessage noRepeat(NoRepeatException e) {
+        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
+     * API 예외처리 AlreadyReportedException
+     * @param e AlreadyReportedException
+     * @return ErrorResultAndMessage
+     * @apiNote AlreadyReportedException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(AlreadyReportedException.class)
+    public ErrorResultAndMessage alreadyReported(AlreadyReportedException e) {
+        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
+     * API 예외처리 EmailAlreadyExistException
+     * @param e EmailAlreadyExistException
+     * @return ErrorResultAndMessage
+     * @apiNote EmailAlreadyExistException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(EmailAlreadyExistException.class)
+    public ErrorResultAndMessage emailAlreadyExist(EmailAlreadyExistException e) {
+        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
+     * API 예외처리 NoAuthenticationException
+     * @param e NoAuthenticationException
+     * @return ErrorResultAndMessage
+     * @apiNote NoAuthenticationException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(NoAuthenticationException.class)
+    public ErrorResultAndMessage noAuthentication(NoAuthenticationException e) {
+        return new ErrorResultAndMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
+     * API 예외처리 UnivEmailNotFountException
+     * @param e UnivEmailNotFountException
+     * @return ErrorResultAndMessage
+     * @apiNote UnivEmailNotFountException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(UnivEmailNotFountException.class)
+    public ErrorResultAndMessage univEmailNotFound(UnivEmailNotFountException e) {
+        return new ErrorResultAndMessage(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
+     * API 예외처리 UserAlreadyExistException
+     * @param e UserAlreadyExistException
+     * @return ErrorResultAndMessage
+     * @apiNote UserAlreadyExistException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ErrorResultAndMessage userAlreadyExist(UserAlreadyExistException e) {
+        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
+     * API 예외처리 UserNotExistException
+     * @param e UserNotExistException
+     * @return ErrorResultAndMessage
+     * @apiNote UserNotExistException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(UserNotExistException.class)
+    public ErrorResultAndMessage userNotExist(UserNotExistException e) {
+        return new ErrorResultAndMessage(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
      * API 예외처리 핸들러_범용_RuntimeException
      * @param e RuntimeException
      * @return ErrorResultAndMessage
      * @apiNote RuntimeException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(RuntimeException.class)
     public ErrorResultAndMessage runtimeException(RuntimeException e) {
         log.debug("RuntimeException={}", e.getMessage());
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+        return new ErrorResultAndMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), "서버에 오류가 발생했습니다.");
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorResultAndMessage internalServerError(Exception e) {
         log.debug("Exception={}", e.getMessage());
-        return new ErrorResultAndMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), e.getMessage());
+        return new ErrorResultAndMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), "서버에 오류가 발생했습니다.");
     }
 }
