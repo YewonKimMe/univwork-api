@@ -49,20 +49,45 @@ public class EmailService {
             message.setFrom(senderMailAddress);
             message.addRecipients(MimeMessage.RecipientType.TO, receiverEmailAddress);
             message.setSubject("[univwork 메일 인증]"); // 이메일 제목
-            message.setText(setContext(verifyLink), StandardCharsets.UTF_8.name().toLowerCase(), "html");
+            message.setText(setContext(verifyLink, "emailTemplate"), StandardCharsets.UTF_8.name().toLowerCase(), "html");
         } catch (MessagingException e) {
             throw new RuntimeException(e.getMessage());
         }
         emailSender.send(message);
     }
 
-    private String setContext(String link) {
+    private String setContext(String link, String templateName) {
         Context context = new Context();
         context.setVariable("link", link);
         context.setVariable("subLink", link);
-        return templateEngine.process("emailTemplate", context);
+        return templateEngine.process(templateName, context);
     }
+    @Async
+    public void sendPasswordFindEmail(String receiverEmailAddress, String authToken) {
 
+        String host = environment.getProperty("email.verify.path.host");
+        String url = environment.getProperty("email.password.path.host");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(host);
+        sb.append(url);
+        sb.append("?");
+        sb.append("authToken=");
+        sb.append(authToken);
+        String verifyLink = sb.toString();
+        log.debug("verifyLink={}", verifyLink);
+
+        MimeMessage message = emailSender.createMimeMessage();
+        try {
+            message.setFrom(senderMailAddress);
+            message.addRecipients(MimeMessage.RecipientType.TO, receiverEmailAddress);
+            message.setSubject("[univwork 비밀번호 찾기]"); // 이메일 제목
+            message.setText(setContext(verifyLink, "findPasswordEmail"), StandardCharsets.UTF_8.name().toLowerCase(), "html");
+        } catch (MessagingException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        emailSender.send(message);
+    }
     public String createVerifyCode() {
         Random random = new Random();
         int code = 100000 + random.nextInt(900000); // 100000부터 999999까지의 범위 무작위 정수 생성
