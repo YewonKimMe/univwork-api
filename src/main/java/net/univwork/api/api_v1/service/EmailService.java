@@ -66,7 +66,7 @@ public class EmailService {
     public void sendPasswordFindEmail(String receiverEmailAddress, String authToken) {
 
         String host = environment.getProperty("email.verify.path.host");
-        String url = environment.getProperty("email.password.path.host");
+        String url = environment.getProperty("email.password.path.url");
 
         StringBuilder sb = new StringBuilder();
         sb.append(host);
