@@ -49,7 +49,7 @@ public class FindPasswordService {
     // auth token 기반 으로 검증
     public void changePassword(String authToken, String password) {
         String userEmail = redisService.find(authToken);
-        if (userEmail.isEmpty()) {
+        if (userEmail == null) {
             throw new IllegalArgumentException("인증 토큰이 만료되었거나 유효하지 않습니다.");
         }
         String encodedPwd = passwordEncoder.encode(password);
