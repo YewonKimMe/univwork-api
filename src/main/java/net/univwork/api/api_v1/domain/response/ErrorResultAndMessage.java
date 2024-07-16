@@ -14,5 +14,5 @@ public class ErrorResultAndMessage implements ResultAndMessage{
 
     private String HttpCode;
 
-    private String message;
+    private Object message;
 }
