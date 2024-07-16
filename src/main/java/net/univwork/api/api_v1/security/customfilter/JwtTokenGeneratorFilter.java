@@ -65,7 +65,7 @@ public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
         AntPathMatcher pathMatcher = new AntPathMatcher();
         log.debug("request path = {}", path);
         log.debug("pathMatcher Result={}", pathMatcher.match("/api/v1/login", path));
-        // TODO
+
         return !pathMatcher.match("/api/v1/login", path);
     }
 
