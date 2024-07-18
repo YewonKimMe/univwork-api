@@ -146,6 +146,7 @@ public class WorkplaceController {
         CommentDto commentDto = service.saveWorkplaceComment(comment, univCode, workplaceCode, ipAddr, authentication); // 댓글 저장 후, 리턴하기 위해 CommentDto 형식으로 반환
 
         log.debug("Saved And return CommentDto={}", commentDto);
+        log.info("Saved WorkplaceComment: user={}, IP address={}", authentication.getName(), ipAddr);
 
         return ResponseEntity.ok(commentDto);
     }
