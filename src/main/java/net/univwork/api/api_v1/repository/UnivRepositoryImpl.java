@@ -37,6 +37,19 @@ public class UnivRepositoryImpl implements UnivRepository {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
+    @Override
+    public University getUniv(Long univCode) {
+        QUniversity university = QUniversity.university;
+        BooleanBuilder builder = new BooleanBuilder(); // 조건
+
+        builder.and(university.univCode.eq(univCode));
+        return queryFactory
+                .select(university)
+                .from(university)
+                .where(builder)
+                .fetchOne();
+    }
+
     /**
      * 모든 대학교를 가져오는데, univName과 sortOption에 따라 정렬된 결과를 가져오는 함수
      * @param pageable pageable 객체(서비스 계층에서 구성)

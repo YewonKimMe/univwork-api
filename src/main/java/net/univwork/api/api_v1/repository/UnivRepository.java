@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface UnivRepository {
 
+    University getUniv(Long univCode);
+
     /**
      * 대학교 리스트를 페이지로 가져오는 메소드
      * @param pageable 페이지 요청 객체

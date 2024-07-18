@@ -23,6 +23,10 @@ public class UnivService {
 
     private final UnivRepository univRepository;
 
+    public University getUniv(Long univCode) {
+        return univRepository.getUniv(univCode);
+    }
+
     /**
      * getUniversities: 학교들이 담긴 페이지를 반환, 정렬 및 검색 가능
      * @param pageNumber 페이지 숫자
