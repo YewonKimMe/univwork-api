@@ -38,6 +38,7 @@ public class UserService {
                 .univ(UnivEmailDomain.checkDomainFromString(user.getUnivDomain()))
                 .createDate(user.getCreateDate().toLocalDateTime())
                 .verification(user.isVerification())
+                .domain(user.getUnivDomain())
                 .build();
         return userDetailDto;
     }

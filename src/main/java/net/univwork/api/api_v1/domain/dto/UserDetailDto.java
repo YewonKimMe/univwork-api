@@ -22,5 +22,7 @@ public class UserDetailDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createDate;
 
+    private String domain;
+
     private boolean verification;
 }
