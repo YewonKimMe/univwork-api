@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.CommentDto;
 import net.univwork.api.api_v1.domain.dto.CommentFormDto;
+import net.univwork.api.api_v1.domain.dto.UserDetailDto;
+import net.univwork.api.api_v1.domain.entity.University;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
 import net.univwork.api.api_v1.enums.SortOption;
 import net.univwork.api.api_v1.enums.WorkplaceType;
+import net.univwork.api.api_v1.exception.DomainNotMatchException;
 import net.univwork.api.api_v1.repository.WorkplaceRepository;
 import net.univwork.api.api_v1.tool.UUIDConverter;
 import net.univwork.api.api_v1.tool.UserInputXSSGuard;
@@ -16,12 +19,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,9 @@ public class WorkplaceService {
 
     private final UserInputXSSGuard xssGuard;
 
-    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
+
+    private final UnivService univService;
 
     /**
      * 근로지 정보를 획득하는 메소드
@@ -101,6 +104,13 @@ public class WorkplaceService {
 
         // 근로지 우선 획득(학교 이름 필요)
         Workplace findWorkplace = getWorkplace(univCode, workplaceCode);
+
+        // 학교, 유저 획득 후, domain 이 다르면 예외 발생 처리
+        University univ = univService.getUniv(univCode);
+        UserDetailDto userDto = userService.findUserById(authentication.getName());
+        if (!univ.getDomain().equals(userDto.getDomain())) {
+            throw new DomainNotMatchException("재학중인 대학 근로지에만 댓글 작성이 가능합니다.");
+        }
 
         // commentUUID를 바이트배열로 변경
         byte[] commentUuidByte = UUIDConverter.convertUuidToBinary16();
