@@ -15,9 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -41,6 +39,13 @@ public class FindPasswordController {
         }
         findPasswordService.sendFindPasswordEmail(email.getEmail());
         return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "비밀번호 변경 이메일이\n" + email.getEmail() + " 으로 발송 되었습니다."));
+    }
+
+    @Operation(summary = "인증 토큰 검증", description = "인증 토큰 검증 및 이메일 획득")
+    @GetMapping("/auth-token-and-email")
+    public ResponseEntity<ResultAndMessage> verifyAuthTokenAndGetEmail(@RequestParam(name = "authToken") String authToken) {
+        String email = findPasswordService.checkAuthTokenAndReturnEmail(authToken);
+        return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), email));
     }
 
     @Operation(summary = "비밀번호 변경", description = "이메일 속 링크로 비밀번호 변경")
