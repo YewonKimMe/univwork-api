@@ -218,6 +218,19 @@ public class ExceptionAdviceController {
     }
 
     /**
+     * API 예외처리 DomainNotMatchException
+     * @param e DomainNotMatchException
+     * @return ErrorResultAndMessage
+     * @apiNote DomainNotMatchException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DomainNotMatchException.class)
+    public ErrorResultAndMessage userNotExist(DomainNotMatchException e) {
+        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
      * API 예외처리 핸들러_범용_RuntimeException
      * @param e RuntimeException
      * @return ErrorResultAndMessage
