@@ -20,7 +20,7 @@ public class University {
     private String univUuid;
 
     @Column
-    private String establishment;
+    private String domain;
 
     @Column
     private String region;

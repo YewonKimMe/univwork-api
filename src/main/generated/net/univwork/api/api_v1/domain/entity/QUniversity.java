@@ -21,7 +21,7 @@ public class QUniversity extends EntityPathBase<University> {
 
     public final StringPath academicSystem = createString("academicSystem");
 
-    public final StringPath establishment = createString("establishment");
+    public final StringPath domain = createString("domain");
 
     public final StringPath region = createString("region");
 
