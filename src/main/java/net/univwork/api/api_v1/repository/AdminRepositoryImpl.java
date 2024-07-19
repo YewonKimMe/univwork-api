@@ -40,11 +40,13 @@ public class AdminRepositoryImpl implements AdminRepository {
         if (noticeOpt.isEmpty()) {
             throw new NoticeNotFoundException("해당 ID 로 발견된 공지사항이 없습니다. id = " + no);
         }
+        log.debug("dto: {}", dto);
         Notice findNotice = noticeOpt.get();
         findNotice.setTitle(dto.getTitle());
         findNotice.setClassification(dto.getClassification());
         findNotice.setNoticeTimestamp(new Timestamp(System.currentTimeMillis()));
         findNotice.setContent(dto.getContent());
+        log.debug("Notice: {}", findNotice);
     }
 
     @Override
