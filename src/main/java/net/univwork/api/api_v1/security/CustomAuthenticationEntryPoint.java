@@ -24,6 +24,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
 
         log.debug("AuthenticationEntryPoint, unauthenticated request detected");
+        log.info("AuthenticationEntryPoint, unauthenticated request detected, path={}", request.getServletPath());
         Exception e = (Exception) request.getAttribute("exception");
         if (e != null) {
             log.debug("exception: {}", e.getMessage());
