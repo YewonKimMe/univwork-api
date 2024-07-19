@@ -5,11 +5,13 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import net.univwork.api.api_v1.domain.entity.Notice;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class NoticeAdminDto {
 
     @NotBlank(message = "공지 제목 입력 필수")
