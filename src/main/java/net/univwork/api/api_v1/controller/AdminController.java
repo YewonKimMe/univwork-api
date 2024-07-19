@@ -57,7 +57,7 @@ public class AdminController {
 
         return ResponseEntity
                 .ok()
-                .cacheControl(CacheControl.maxAge(10, TimeUnit.SECONDS))
+                .cacheControl(CacheControl.maxAge(2, TimeUnit.SECONDS))
                 .body(model);
     }
 
@@ -83,7 +83,7 @@ public class AdminController {
     @PutMapping("/notices/{no}")
     public ResponseEntity<ResultAndMessage> saveNoticeEdit(@PathVariable(name = "no") Long no, @Validated @RequestBody NoticeAdminDto noticeAdminDto) {
         adminService.editAndSaveNotice(noticeAdminDto, no);
-        return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "공지사항이 작성되었습니다."));
+        return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "공지사항이 수정 되었습니다."));
     }
 
     @Operation(summary = "공지사항 삭제", description = "공지사항 삭제, ADMIN")
