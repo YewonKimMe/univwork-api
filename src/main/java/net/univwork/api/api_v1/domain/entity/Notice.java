@@ -1,5 +1,7 @@
 package net.univwork.api.api_v1.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +35,7 @@ public class Notice {
     @Column
     private int hits;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     @Column(name = "notice_timestamp")
     private Timestamp noticeTimestamp;
 
@@ -45,6 +48,7 @@ public class Notice {
     @Column(name = "comment_num")
     private int commentNum;
 
+    @JsonIgnore
     @Column
     private boolean isDeleted;
 
