@@ -231,6 +231,19 @@ public class ExceptionAdviceController {
     }
 
     /**
+     * API 예외처리 NoticeNotFoundException
+     * @param e NoticeNotFoundException
+     * @return ErrorResultAndMessage
+     * @apiNote NoticeNotFoundException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoticeNotFoundException.class)
+    public ErrorResultAndMessage noticeNotFound(NoticeNotFoundException e) {
+        return new ErrorResultAndMessage(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+    }
+
+    /**
      * API 예외처리 핸들러_범용_RuntimeException
      * @param e RuntimeException
      * @return ErrorResultAndMessage
