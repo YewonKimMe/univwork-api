@@ -30,4 +30,8 @@ public interface JpaWorkplaceCommentRepository extends JpaRepository<WorkplaceCo
     int updateReportColumn(@Param("commentUuid") byte[] commentUuid);
 
     Optional<WorkplaceComment> findWorkplaceCommentByCommentUuid(byte[] commentUuid);
+
+    @Modifying
+    @Query("UPDATE WorkplaceComment wc SET wc.deleteFlag = true where wc.commentUuid = :commentUuid")
+    void deleteWorkplaceComment(@Param("commentUuid") byte[] uuid);
 }
