@@ -50,6 +50,7 @@ public class SingUpService {
                 .verification(false)
                 .univDomain(userUnivDomain)
                 .authorities(new HashSet<>())
+                .blockedFlag(false)
                 .build();
 
         // Authority 생성
