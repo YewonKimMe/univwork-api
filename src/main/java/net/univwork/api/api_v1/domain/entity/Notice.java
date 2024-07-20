@@ -35,7 +35,7 @@ public class Notice {
     @Column
     private int hits;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     @Column(name = "notice_timestamp")
     private Timestamp noticeTimestamp;
 
