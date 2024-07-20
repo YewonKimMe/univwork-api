@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -37,7 +38,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         String pwd = authentication.getCredentials().toString();
 
-        User user = userRepository.findUserByUserId(username).orElseThrow(() -> new BadCredentialsException(badCredentialsMessage));
+        log.debug("username={}, pwd={}", username, pwd);
+        log.debug("login 검증 시작");
+        Optional<User> userOpt = userRepository.findUserByUserId(username);
+        if (userOpt.isEmpty()) {
+            log.debug("아이디가 잘못 입력됨");
+            throw new BadCredentialsException(badCredentialsMessage);
+        }
+        User user = userOpt.get();
         log.debug("findUser={}", user.toString());
         if (!user.isVerification()) {
             log.debug("이메일 인증이 필요합니다. 아이디={}", username);
