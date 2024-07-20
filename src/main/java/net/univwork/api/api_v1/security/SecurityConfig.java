@@ -39,6 +39,8 @@ public class SecurityConfig {
 
     private final AuthorityLoggingFilterAfter authorityLoggingFilterAfter;
 
+    private final CustomBasicAuthenticationEntryPoint basicAuthenticationEntryPoint;
+
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
@@ -83,7 +85,9 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(configurer -> configurer
+                        .authenticationEntryPoint(basicAuthenticationEntryPoint)
+                );
         return http.build();
     }
 
