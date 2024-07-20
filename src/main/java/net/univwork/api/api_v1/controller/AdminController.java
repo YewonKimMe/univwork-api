@@ -63,8 +63,9 @@ public class AdminController {
 
     @Operation(summary = "공지사항 작성", description = "공지사항 최초 작성, ADMIN")
     @PostMapping("/notices")
-    public ResponseEntity<ResultAndMessage> writeNotice(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "공지사항 객체") @Validated @RequestBody NoticeAdminDto noticeAdminDto) {
-        adminService.saveNotice(noticeAdminDto);
+    public ResponseEntity<ResultAndMessage> writeNotice(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "공지사항 객체") @Validated @RequestBody NoticeAdminDto noticeAdminDto,
+                                                        Authentication authentication) {
+        adminService.saveNotice(noticeAdminDto, authentication);
         return new ResponseEntity<>(new SuccessResultAndMessage(HttpStatus.CREATED.getReasonPhrase(), "공지사항이 작성되었습니다."), HttpStatus.CREATED);
     }
 
@@ -81,15 +82,17 @@ public class AdminController {
 
     @Operation(summary = "공지사항 수정 후 저장", description = "공지사항 수정 후 업데이트, ADMIN")
     @PutMapping("/notices/{no}")
-    public ResponseEntity<ResultAndMessage> saveNoticeEdit(@PathVariable(name = "no") Long no, @Validated @RequestBody NoticeAdminDto noticeAdminDto) {
-        adminService.editAndSaveNotice(noticeAdminDto, no);
+    public ResponseEntity<ResultAndMessage> saveNoticeEdit(@PathVariable(name = "no") Long no, @Validated @RequestBody NoticeAdminDto noticeAdminDto,
+                                                           Authentication authentication) {
+        adminService.editAndSaveNotice(noticeAdminDto, no, authentication);
         return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "공지사항이 수정 되었습니다."));
     }
 
     @Operation(summary = "공지사항 삭제", description = "공지사항 삭제, ADMIN")
     @DeleteMapping("/notices/{no}")
-    public ResponseEntity<ResultAndMessage> deleteNotice(@PathVariable(name = "no") Long no) {
-        adminService.deleteNotice(no);
+    public ResponseEntity<ResultAndMessage> deleteNotice(@PathVariable(name = "no") Long no,
+                                                         Authentication authentication) {
+        adminService.deleteNotice(no, authentication);
         return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "공지사항이 삭제 되었습니다."));
     }
 
