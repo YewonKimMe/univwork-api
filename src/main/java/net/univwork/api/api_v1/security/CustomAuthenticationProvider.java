@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.entity.Authority;
 import net.univwork.api.api_v1.domain.entity.User;
+import net.univwork.api.api_v1.exception.BlockedClientException;
 import net.univwork.api.api_v1.repository.jpa.JpaUserRepository;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -51,7 +52,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             log.debug("이메일 인증이 필요합니다. 아이디={}", username);
             throw new BadCredentialsException("최초 이메일 인증 이후에 로그인이 가능합니다.");
         }
-
+        if (user.isBlockedFlag()) {
+            throw new BadCredentialsException("차단된 계정입니다. 운영자에게 문의 하세요.");
+        }
         if (passwordEncoder.matches(pwd, user.getPwd())) {
             log.debug("로그인 성공, ID={}", username);
             return new UsernamePasswordAuthenticationToken(username, pwd, getGrantedAuthorities(user.getAuthorities()));
