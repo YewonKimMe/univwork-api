@@ -22,6 +22,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final SetPath<Authority, QAuthority> authorities = this.<Authority, QAuthority>createSet("authorities", Authority.class, QAuthority.class, PathInits.DIRECT2);
 
+    public final BooleanPath blockedFlag = createBoolean("blockedFlag");
+
     public final DateTimePath<java.sql.Timestamp> createDate = createDateTime("createDate", java.sql.Timestamp.class);
 
     public final StringPath email = createString("email");

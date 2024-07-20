@@ -43,4 +43,6 @@ public class User {
     @OneToMany(mappedBy="user", fetch=FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Authority> authorities;
 
+    @Column(name = "is_blocked")
+    private boolean blockedFlag;
 }
