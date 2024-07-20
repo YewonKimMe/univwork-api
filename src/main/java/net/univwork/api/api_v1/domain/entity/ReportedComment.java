@@ -1,10 +1,9 @@
 package net.univwork.api.api_v1.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Timestamp;
 
@@ -12,12 +11,14 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "reported_comment")
+@Getter
+@Setter
 @Builder
 public class ReportedComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long No;
+    private Long no;
 
     @Column(name = "comment_uuid")
     private byte[] commentUuid;
@@ -38,9 +39,10 @@ public class ReportedComment {
 
     private String reason;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private Timestamp time;
 
+    @JsonIgnore
     @Column(name = "in_progress")
     private boolean inProgress;
 }

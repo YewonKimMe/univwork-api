@@ -26,7 +26,7 @@ public class CommentDto {
 
     private int upvote;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private Timestamp timestamp;
 
     private boolean deleteFlag;
