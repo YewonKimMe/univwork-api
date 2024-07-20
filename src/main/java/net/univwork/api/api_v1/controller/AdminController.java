@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
 import net.univwork.api.api_v1.domain.entity.Notice;
+import net.univwork.api.api_v1.domain.entity.ReportedComment;
 import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.domain.response.SuccessResultAndMessage;
 import net.univwork.api.api_v1.service.AdminService;
@@ -98,14 +99,21 @@ public class AdminController {
 
     @Operation(summary = "신고 댓글 조회", description = "신고 댓글 전체 조회, ADMIN")
     @GetMapping("/reported-comments")
-    public ResponseEntity<Object> getReportedComments() {
-        return null;
+    public ResponseEntity<PagedModel<EntityModel<ReportedComment>>> getReportedComments(
+            @RequestParam(name = "page", defaultValue = "0") final int pageNumber,
+            @RequestParam(name = "size", defaultValue = "30") final int pageLimit,
+            @Parameter(hidden = true) PagedResourcesAssembler<ReportedComment> assembler
+    ) {
+        Page<ReportedComment> reportedCommentList = adminService.getReportedCommentList(pageNumber, pageLimit);
+        PagedModel<EntityModel<ReportedComment>> model = assembler.toModel(reportedCommentList);
+        return ResponseEntity.ok().body(model);
     }
 
     @Operation(summary = "신고된 댓글 삭제", description = "신고 댓글 삭제, ADMIN")
     @DeleteMapping("/reported-comments/{commentId}")
-    public ResponseEntity<ResultAndMessage> deleteReportedComment(@PathVariable(name = "commentId") String parameter) {
-        return null;
+    public ResponseEntity<ResultAndMessage> deleteReportedComment(@PathVariable(name = "commentId") String commentUuid) {
+        adminService.deleteCommentToReported(commentUuid);
+        return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "댓글이 삭제 처리 되었습니다."));
     }
 
     @Operation(summary = "유저 차단", description = "유저 차단(신고된 사람 or 신고자), userId 로 결정, ADMIN")
@@ -119,5 +127,7 @@ public class AdminController {
     public ResponseEntity<ResultAndMessage> dismissReport(@PathVariable(name = "reportedId") String reportedId) {
         return null;
     }
+
+
 
 }
