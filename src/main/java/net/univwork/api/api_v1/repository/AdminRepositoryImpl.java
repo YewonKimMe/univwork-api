@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
 import net.univwork.api.api_v1.domain.entity.Notice;
+import net.univwork.api.api_v1.domain.entity.ReportedComment;
 import net.univwork.api.api_v1.exception.NoticeNotFoundException;
 import net.univwork.api.api_v1.repository.jpa.JpaAdminNoticeRepository;
+import net.univwork.api.api_v1.repository.jpa.JpaAdminReportedCommentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -19,6 +21,8 @@ import java.util.Optional;
 public class AdminRepositoryImpl implements AdminRepository {
 
     private final JpaAdminNoticeRepository jpaAdminNoticeRepository;
+
+    private final JpaAdminReportedCommentRepository jpaAdminReportedCommentRepository;
 
     @Override
     public Notice getNotice(Long no) {
@@ -62,5 +66,10 @@ public class AdminRepositoryImpl implements AdminRepository {
     @Override
     public Page<Notice> getNoticeList(Pageable pageable) {
         return jpaAdminNoticeRepository.getNoticePage(pageable);
+    }
+
+    @Override
+    public Page<ReportedComment> getReportedCommentList(Pageable pageable) {
+        return jpaAdminReportedCommentRepository.getReportedCommentList(pageable);
     }
 }
