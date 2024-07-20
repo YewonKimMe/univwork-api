@@ -25,7 +25,7 @@ public class QReportedComment extends EntityPathBase<ReportedComment> {
 
     public final BooleanPath inProgress = createBoolean("inProgress");
 
-    public final NumberPath<Long> No = createNumber("No", Long.class);
+    public final NumberPath<Long> no = createNumber("no", Long.class);
 
     public final StringPath reason = createString("reason");
 
