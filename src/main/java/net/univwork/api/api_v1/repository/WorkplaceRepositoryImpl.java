@@ -1,19 +1,24 @@
 package net.univwork.api.api_v1.repository;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.univwork.api.api_v1.domain.entity.QWorkplaceComment;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
 import net.univwork.api.api_v1.repository.jpa.JpaWorkplaceCommentRepository;
 import net.univwork.api.api_v1.repository.jpa.JpaWorkplaceRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Slf4j
-@RequiredArgsConstructor
 @Repository
 public class WorkplaceRepositoryImpl implements WorkplaceRepository{
 
@@ -21,8 +26,18 @@ public class WorkplaceRepositoryImpl implements WorkplaceRepository{
 
     private final JpaWorkplaceCommentRepository jpaWorkplaceCommentRepository;
 
-    @PersistenceContext
     private final EntityManager em;
+
+    private final JPAQueryFactory queryFactory;
+
+    public WorkplaceRepositoryImpl(JpaWorkplaceRepository jpaWorkplaceRepository,
+                                   JpaWorkplaceCommentRepository jpaWorkplaceCommentRepository,
+                                   EntityManager em) {
+        this.jpaWorkplaceRepository = jpaWorkplaceRepository;
+        this.jpaWorkplaceCommentRepository = jpaWorkplaceCommentRepository;
+        this.em = em;
+        this.queryFactory = new JPAQueryFactory(em);
+    }
 
     /**
      * getWorkplace: 근로지 정보를 가져오는 메소드
@@ -46,7 +61,29 @@ public class WorkplaceRepositoryImpl implements WorkplaceRepository{
      * */
     @Override
     public Page<WorkplaceComment> getWorkplaceComments(Pageable pageable, final Long univCode, final Long workplaceCode) {
-        return jpaWorkplaceCommentRepository.getWorkplaceComments(pageable, univCode, workplaceCode);
+        QWorkplaceComment workplaceComment = QWorkplaceComment.workplaceComment;
+        BooleanBuilder builder = new BooleanBuilder(); // 조건
+        OrderSpecifier<?> orderSpecifier = null; // 정렬
+
+        builder.and(workplaceComment.univCode.eq(univCode));
+        builder.and(workplaceComment.workplaceCode.eq(workplaceCode));
+
+        orderSpecifier = workplaceComment.timestamp.desc();
+
+        List<WorkplaceComment> workplaceComments = queryFactory
+                .select(workplaceComment)
+                .from(workplaceComment)
+                .where(builder)
+                .orderBy(orderSpecifier)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+        JPAQuery<Long> countQuery = queryFactory
+                .select(workplaceComment.count())
+                .from(workplaceComment)
+                .where(builder);
+
+        return PageableExecutionUtils.getPage(workplaceComments, pageable, countQuery::fetchOne);
     }
 
     /**
