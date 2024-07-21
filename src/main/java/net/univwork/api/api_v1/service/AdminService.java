@@ -83,10 +83,10 @@ public class AdminService {
 
     // 신고된 원본 댓글 삭제(soft) 메소드
     public void deleteCommentToReported(String commentUuid) {
-        byte[] uuidBytes = UUIDConverter.uuidDecodeToByteArray(commentUuid);
+        byte[] uuidBytes = UUIDConverter.convertUuidStringToBinary16(commentUuid);
         Optional<WorkplaceComment> commentOpt = commentRepository.findWorkplaceCommentByCommentUuid(uuidBytes);
         if (commentOpt.isEmpty()) {
-            log.debug("uuid missing, uuid={}", UUIDConverter.convertBinary16ToUUID(uuidBytes).toString());
+            log.debug("uuid missing, uuid={}", commentUuid);
             throw new IllegalArgumentException("해당 UUID 로 검색된 댓글이 없습니다.");
         }
         WorkplaceComment workplaceComment = commentOpt.get();
@@ -97,17 +97,34 @@ public class AdminService {
         log.info("[신고된 댓글 삭제] 댓글 uuid: {}", UUIDConverter.convertBinary16ToUUID(uuidBytes).toString());
     }
 
-    public void blockUser(String userId, String encodedCommentUuid, BlockRole blockRole) {
+    public void blockUser(String userId, String commentUuidString, BlockRole blockRole) {
 
-        byte[] uuidByte = UUIDConverter.uuidDecodeToByteArray(encodedCommentUuid);
+        byte[] uuidBytes = UUIDConverter.convertUuidStringToBinary16(commentUuidString);
 
         adminRepository.blockUser(userId);
+
         if (blockRole == BlockRole.WRITER) {
             log.info("[댓글 작성자 차단] userId: {}", userId);
+            Optional<WorkplaceComment> commentOpt = commentRepository.findWorkplaceCommentByCommentUuid(uuidBytes);
+
+            if (commentOpt.isEmpty()) {
+                log.debug("uuid missing, uuid={}", commentUuidString);
+                throw new IllegalArgumentException("해당 UUID 로 검색된 댓글이 없습니다.");
+            }
+
+            WorkplaceComment workplaceComment = commentOpt.get();
+            workplaceComment.setDeleteFlag(true);
+
         } else if (blockRole == BlockRole.REPORTER) {
             log.info("[댓글 신고자 차단] userId: {}", userId);
         }
 
-        reportedCommentRepository.makeProgressOver(uuidByte);
+        reportedCommentRepository.makeProgressOver(uuidBytes);
+    }
+
+    public void dismissReport(String uuidString) {
+        byte[] uuidBytes = UUIDConverter.convertUuidStringToBinary16(uuidString);
+        reportedCommentRepository.makeProgressOver(uuidBytes);
+        log.info("[신고 반려] uuid: {}", UUIDConverter.convertBinary16ToUUID(uuidBytes).toString());
     }
 }
