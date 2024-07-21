@@ -45,7 +45,7 @@ public class NoticeRepositoryImpl implements NoticeRepository {
         orderSpecifier = notice.noticeTimestamp.desc();
 
         List<NoticeTitleDto> noticesList = queryFactory
-                .select(Projections.constructor(NoticeTitleDto.class, notice.no, notice.noticeId, notice.title, notice.classification, notice.author, notice.noticeTimestamp, notice.isFixed))
+                .select(Projections.constructor(NoticeTitleDto.class, notice.no, notice.noticeId, notice.title, notice.classification, notice.author, notice.hits, notice.noticeTimestamp, notice.isFixed))
                 .from(notice)
                 .where(builder)
                 .orderBy(orderSpecifier)
