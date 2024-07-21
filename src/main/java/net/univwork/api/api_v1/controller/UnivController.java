@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -56,11 +55,12 @@ public class UnivController {
             @Parameter(name = "sort", description = "정렬 옵션<br>univAsc_학교명 오름차순<br>univDesc_학교명 내림차순", in = ParameterIn.QUERY)
     })
     @GetMapping
-    public ResponseEntity<Page<University>> getAllUniversities(
-            @RequestParam(name = "pageNumber", defaultValue = "0") final int pageNumber,
-            @RequestParam(name = "pageLimit", defaultValue = "30") final int pageLimit,
+    public ResponseEntity<PagedModel<EntityModel<University>>> getAllUniversities(
+            @RequestParam(name = "page", defaultValue = "0") final int pageNumber,
+            @RequestParam(name = "size", defaultValue = "30") final int pageLimit,
             @RequestParam(name = "universityName", required = false) final String universitySearchKeyword,
-            @RequestParam(name = "sort", defaultValue = ConstString.UNIV_NAME_ASC) final String sortParam) {
+            @RequestParam(name = "sort", defaultValue = ConstString.UNIV_NAME_ASC) final String sortParam,
+            @Parameter(hidden = true) PagedResourcesAssembler<University> assembler) {
 
         log.debug("pageNumber={}, pageLimit={}, universitySearchKeyword={}, sortParam={}",pageNumber, pageLimit, universitySearchKeyword, sortParam);
         // enum 획득
@@ -69,9 +69,11 @@ public class UnivController {
         // 학교 페이지 + 조건 조회
         Page<University> universityPage = univService.getUniversities(pageNumber, pageLimit, universitySearchKeyword, sortOption);
 
+        PagedModel<EntityModel<University>> model = assembler.toModel(universityPage);
+
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS))
-                .body(universityPage);
+                .body(model);
     }
 
     /**
