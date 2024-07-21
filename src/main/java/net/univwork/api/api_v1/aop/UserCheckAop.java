@@ -58,7 +58,7 @@ public class UserCheckAop {
         log.debug("userAuthCheck aspect");
         // 반복하여 등록했을 경우
         if (CookieUtils.checkCookie(request, CookieName.REPEAT_REQUEST)) {
-            throw new NoRepeatException("짧은 시간 내에 반복하여 요청 할 수 없습니다. 잠시 후 다시 시도해 주세요.");
+            throw new NoRepeatException("짧은 시간 내에 반복하여 요청 할 수 없습니다.\n잠시 후 다시 시도해 주세요.");
         }
 
 
