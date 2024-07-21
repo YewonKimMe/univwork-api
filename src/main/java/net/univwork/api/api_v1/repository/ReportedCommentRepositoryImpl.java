@@ -16,4 +16,11 @@ public class ReportedCommentRepositoryImpl implements ReportedCommentRepository 
     public void save(ReportedComment reportedComment) {
         jpaReportedCommentRepository.save(reportedComment);
     }
+
+    @Override
+    public void makeProgressOver(byte[] commentUuid) {
+        ReportedComment reportedComment = jpaReportedCommentRepository.findReportedCommentByCommentUuid(commentUuid);
+
+        reportedComment.setInProgress(false);
+    }
 }

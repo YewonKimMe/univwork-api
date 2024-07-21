@@ -5,4 +5,6 @@ import net.univwork.api.api_v1.domain.entity.ReportedComment;
 public interface ReportedCommentRepository {
 
     void save(ReportedComment reportedCommentResult);
+
+    void makeProgressOver(byte[] commentUuid);
 }
