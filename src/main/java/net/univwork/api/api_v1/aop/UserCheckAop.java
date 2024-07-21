@@ -55,18 +55,7 @@ public class UserCheckAop {
      * */
     @Around("userAuthCheck()")
     public Object userCheck(ProceedingJoinPoint joinPoint) throws Throwable {
-
-        // USER_COOKIE 가 존재하지 않을 경우, 예외 발생
-//        if (!CookieUtils.checkCookie(request, CookieName.USER_COOKIE)) {
-//            throw new NoUserCodeException("user uuid does not exist in the request.");
-//        }
-
-        // 사전 차단된 유저 검증 로직, 쿠키로 확인
-//        if (CookieUtils.checkCookie(request, CookieName.BLOCKED_FIRST_CHECK_COOKIE)) {
-//            log.debug("blocked first detected={}", new Timestamp(System.currentTimeMillis()));
-//            throw new BlockedClientException("already blocked user");
-//        }
-
+        log.debug("userAuthCheck aspect");
         // 반복하여 등록했을 경우
         if (CookieUtils.checkCookie(request, CookieName.REPEAT_REQUEST)) {
             throw new NoRepeatException("짧은 시간 내에 반복하여 요청 할 수 없습니다. 잠시 후 다시 시도해 주세요.");
@@ -82,12 +71,12 @@ public class UserCheckAop {
 //        }
 
         // IP 주소 검증 로직
-        String userIpAddr = IpTool.getIpAddr(request);
-        BlockedIp blockedIp = blockedService.findBlockedIp(userIpAddr);
-        if (blockedIp != null && blockedIp.getBlockedIp().equals(userIpAddr)) {
-            //setBlockCookie(response); // 사전 차단용 쿠키를 세팅
-            throw new BlockedClientException("blocked user ip");
-        }
+//        String userIpAddr = IpTool.getIpAddr(request);
+//        BlockedIp blockedIp = blockedService.findBlockedIp(userIpAddr);
+//        if (blockedIp != null && blockedIp.getBlockedIp().equals(userIpAddr)) {
+//            setBlockCookie(response); // 사전 차단용 쿠키를 세팅
+//            throw new BlockedClientException("blocked user ip");
+//        }
 
         // 반복 등록 방지용 쿠키 생성
         setRepeatCookie(response);
@@ -103,11 +92,13 @@ public class UserCheckAop {
     }
 
     private void setRepeatCookie(HttpServletResponse response) {
+        log.debug("response is Committed? = {}", response.isCommitted());
         // 반복 요청 방지용 쿠키 생성
         Cookie cookie = new Cookie(CookieName.REPEAT_REQUEST.getCookieName(), UUID.randomUUID().toString().replaceAll("-", "."));
         cookie.setMaxAge((int) TimeUnit.SECONDS.toSeconds(5));
         cookie.setPath("/");
         response.addCookie(cookie);
+        log.debug("repeat cookie added");
     }
 
 }
