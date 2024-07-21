@@ -6,8 +6,10 @@ import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
 import net.univwork.api.api_v1.domain.entity.Notice;
 import net.univwork.api.api_v1.domain.entity.ReportedComment;
 import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
+import net.univwork.api.api_v1.enums.BlockRole;
 import net.univwork.api.api_v1.repository.AdminRepository;
 import net.univwork.api.api_v1.repository.CommentRepository;
+import net.univwork.api.api_v1.repository.ReportedCommentRepository;
 import net.univwork.api.api_v1.tool.UUIDConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +31,9 @@ public class AdminService {
     private final AdminRepository adminRepository;
 
     private final CommentRepository commentRepository;
+
+    private final ReportedCommentRepository reportedCommentRepository;
+
 
     // 공지사항 리스트 획득 메소드
     public Page<Notice> getNoticeList(final int pageNumber, final int pageLimit) {
@@ -86,5 +91,23 @@ public class AdminService {
         }
         WorkplaceComment workplaceComment = commentOpt.get();
         workplaceComment.setDeleteFlag(true);
+
+        // 신고 리스트에서 제거
+        reportedCommentRepository.makeProgressOver(uuidBytes);
+        log.info("[신고된 댓글 삭제] 댓글 uuid: {}", UUIDConverter.convertBinary16ToUUID(uuidBytes).toString());
+    }
+
+    public void blockUser(String userId, String encodedCommentUuid, BlockRole blockRole) {
+
+        byte[] uuidByte = UUIDConverter.uuidDecodeToByteArray(encodedCommentUuid);
+
+        adminRepository.blockUser(userId);
+        if (blockRole == BlockRole.WRITER) {
+            log.info("[댓글 작성자 차단] userId: {}", userId);
+        } else if (blockRole == BlockRole.REPORTER) {
+            log.info("[댓글 신고자 차단] userId: {}", userId);
+        }
+
+        reportedCommentRepository.makeProgressOver(uuidByte);
     }
 }

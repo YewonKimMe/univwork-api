@@ -5,7 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
 import net.univwork.api.api_v1.domain.entity.Notice;
 import net.univwork.api.api_v1.domain.entity.ReportedComment;
+import net.univwork.api.api_v1.domain.entity.User;
 import net.univwork.api.api_v1.exception.NoticeNotFoundException;
+import net.univwork.api.api_v1.exception.UserNotExistException;
 import net.univwork.api.api_v1.repository.jpa.JpaAdminNoticeRepository;
 import net.univwork.api.api_v1.repository.jpa.JpaAdminReportedCommentRepository;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,8 @@ public class AdminRepositoryImpl implements AdminRepository {
     private final JpaAdminNoticeRepository jpaAdminNoticeRepository;
 
     private final JpaAdminReportedCommentRepository jpaAdminReportedCommentRepository;
+
+    private final UserRepository userRepository;
 
     @Override
     public Notice getNotice(Long no) {
@@ -71,5 +75,15 @@ public class AdminRepositoryImpl implements AdminRepository {
     @Override
     public Page<ReportedComment> getReportedCommentList(Pageable pageable) {
         return jpaAdminReportedCommentRepository.getReportedCommentList(pageable);
+    }
+
+    public void blockUser(String userId) {
+        Optional<User> userOpt = userRepository.findUserByUserId(userId);
+        if (userOpt.isEmpty()) {
+            log.debug("userId={}", userId);
+            throw new UserNotExistException("해당 ID의 유저가 존재하지 않습니다.");
+        }
+        User user = userOpt.get();
+        user.setBlockedFlag(true);
     }
 }

@@ -19,4 +19,6 @@ public interface AdminRepository {
     Page<Notice> getNoticeList(Pageable pageable);
 
     Page<ReportedComment> getReportedCommentList(Pageable pageable);
+
+    void blockUser(String userId);
 }
