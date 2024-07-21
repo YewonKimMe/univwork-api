@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -122,19 +121,21 @@ public class AdminController {
     @Operation(summary = "유저 차단", description = "유저 차단(신고된 사람 writer or 신고자 reporter), userId 로 결정, ADMIN")
     @PatchMapping("/reported-comments/users/{userId}")
     public ResponseEntity<ResultAndMessage> blockUser(@PathVariable(name = "userId") String userId,
-                                                      @RequestParam(name = "commentId") String encodedCommentId,
+                                                      @RequestParam(name = "commentId") String commentId,
                                                       @RequestParam(name = "reason") String reason,
                                                       @Parameter(name = "role", description = "유저 차단 시 작성자, 신고자 구별용") @RequestParam(name = "role") String role) {
-        adminService.blockUser(userId, encodedCommentId, BlockRole.fromValue(role));
+        adminService.blockUser(userId, commentId, BlockRole.fromValue(role));
         log.debug("reason={}", reason);
         String target = role.equals("writer") ? "작성자" : "신고자";
         return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), target + " 차단 완료"));
     }
 
     @Operation(summary = "신고 무시", description = "신고 무시, 신고 리스트에서 제거, ADMIN")
-    @PatchMapping("/reported-comments/{reportedId}")
-    public ResponseEntity<ResultAndMessage> dismissReport(@PathVariable(name = "reportedId") String reportedId) {
-        return null;
+    @PatchMapping("/reported-comments/{commentId}")
+    public ResponseEntity<ResultAndMessage> dismissReport(@PathVariable(name = "commentId") String commentId) {
+        log.debug("uuid={}", commentId);
+        adminService.dismissReport(commentId);
+        return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), commentId + " 의 신고가 반려되었습니다."));
     }
 
 
