@@ -10,6 +10,7 @@ import net.univwork.api.api_v1.domain.entity.Notice;
 import net.univwork.api.api_v1.domain.entity.ReportedComment;
 import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.domain.response.SuccessResultAndMessage;
+import net.univwork.api.api_v1.enums.BlockRole;
 import net.univwork.api.api_v1.service.AdminService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -112,14 +113,22 @@ public class AdminController {
     @Operation(summary = "신고된 댓글 삭제", description = "신고 댓글 삭제, ADMIN")
     @DeleteMapping("/reported-comments/{commentId}")
     public ResponseEntity<ResultAndMessage> deleteReportedComment(@PathVariable(name = "commentId") String commentUuid) {
+
         adminService.deleteCommentToReported(commentUuid);
+
         return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "댓글이 삭제 처리 되었습니다."));
     }
 
-    @Operation(summary = "유저 차단", description = "유저 차단(신고된 사람 or 신고자), userId 로 결정, ADMIN")
-    @PostMapping("/reported-comments/{userId}")
-    public ResponseEntity<ResultAndMessage> blockUser(@PathVariable(name = "userId") String userId) {
-        return null;
+    @Operation(summary = "유저 차단", description = "유저 차단(신고된 사람 writer or 신고자 reporter), userId 로 결정, ADMIN")
+    @PatchMapping("/reported-comments/users/{userId}")
+    public ResponseEntity<ResultAndMessage> blockUser(@PathVariable(name = "userId") String userId,
+                                                      @RequestParam(name = "commentId") String encodedCommentId,
+                                                      @RequestParam(name = "reason") String reason,
+                                                      @Parameter(name = "role", description = "유저 차단 시 작성자, 신고자 구별용") @RequestParam(name = "role") String role) {
+        adminService.blockUser(userId, encodedCommentId, BlockRole.fromValue(role));
+        log.debug("reason={}", reason);
+        String target = role.equals("writer") ? "작성자" : "신고자";
+        return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), target + " 차단 완료"));
     }
 
     @Operation(summary = "신고 무시", description = "신고 무시, 신고 리스트에서 제거, ADMIN")
