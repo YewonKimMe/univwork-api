@@ -22,23 +22,23 @@ public class ExceptionAdviceController {
 
     private final MessageSource ms; // message.properties 접근용
 
-    /**
-     * API 예외 처리 핸들러_MethodArgumentTypeMismatchException
-     * @param e MethodArgumentTypeMismatchException
-     * @return ErrorResultAndMessage
-     * @see ErrorResultAndMessage
-     * @apiNote HTTP 요청 시 Method Parameter 에 잘못된 타입의 인자를 전달한 경우 MethodargumentTypeMismatchException 발생
-     * */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ErrorResultAndMessage methodArgTypeMis(MethodArgumentTypeMismatchException e) {
-        log.debug("[exceptionHandler] ex", e);
-        // messageSource 에서 message 획득, 틀린 파라미터 인덱스와 파라미터 타입
-        String message = ms.getMessage("exception.MethodArgumentTypeMismatchExceptionMessage", new Object[]{e.getParameter().getParameterIndex(), e.getParameter().getParameterType()}, Locale.KOREA);
-
-        log.debug("message={}", message);
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), message);
-    }
+//    /**
+//     * API 예외 처리 핸들러_MethodArgumentTypeMismatchException
+//     * @param e MethodArgumentTypeMismatchException
+//     * @return ErrorResultAndMessage
+//     * @see ErrorResultAndMessage
+//     * @apiNote HTTP 요청 시 Method Parameter 에 잘못된 타입의 인자를 전달한 경우 MethodargumentTypeMismatchException 발생
+//     * */
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+//    public ErrorResultAndMessage methodArgTypeMis(MethodArgumentTypeMismatchException e) {
+//        log.debug("[exceptionHandler] ex", e);
+//        // messageSource 에서 message 획득, 틀린 파라미터 인덱스와 파라미터 타입
+//        String message = ms.getMessage("exception.MethodArgumentTypeMismatchExceptionMessage", new Object[]{e.getParameter().getParameterIndex(), e.getParameter().getParameterType()}, Locale.KOREA);
+//
+//        log.debug("message={}", message);
+//        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), message);
+//    }
 
     /**
      * API 예외처리 핸들러_IllegalArgumentException
