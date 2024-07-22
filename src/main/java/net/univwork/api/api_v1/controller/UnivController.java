@@ -128,7 +128,7 @@ public class UnivController {
                 .toList();
         log.debug("list={}", collect);
         return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS))
+                .cacheControl(CacheControl.maxAge(3, TimeUnit.SECONDS))
                 .body(collect);
     }
 }
