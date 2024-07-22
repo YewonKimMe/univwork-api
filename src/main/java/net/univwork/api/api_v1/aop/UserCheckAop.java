@@ -5,19 +5,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.univwork.api.api_v1.domain.entity.BlockedIp;
-import net.univwork.api.api_v1.domain.entity.BlockedUser;
+import net.univwork.api.api_v1.domain.entity.User;
 import net.univwork.api.api_v1.enums.CookieName;
 import net.univwork.api.api_v1.exception.BlockedClientException;
+import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.exception.NoRepeatException;
-import net.univwork.api.api_v1.exception.NoUserCodeException;
 import net.univwork.api.api_v1.service.BlockedService;
+import net.univwork.api.api_v1.service.UserService;
 import net.univwork.api.api_v1.tool.CookieUtils;
-import net.univwork.api.api_v1.tool.IpTool;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -30,11 +31,11 @@ import java.util.concurrent.TimeUnit;
 @Aspect
 public class UserCheckAop {
 
-    private final BlockedService blockedService;
-
     private final HttpServletRequest request;
 
     private final HttpServletResponse response;
+
+    private final UserService userService;
 
     /**
      * 모든 요청에 대해 적용
@@ -55,6 +56,15 @@ public class UserCheckAop {
      * */
     @Around("userAuthCheck()")
     public Object userCheck(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = null;
+        if (authentication != null) {
+            username = authentication.getName();
+        } else {
+            log.debug("AOP 인증 정보 미존재");
+            throw new NoAuthenticationException("인증 정보가 없습니다.");
+        }
         log.debug("userAuthCheck aspect");
         // 반복하여 등록했을 경우
         if (CookieUtils.checkCookie(request, CookieName.REPEAT_REQUEST)) {
@@ -62,13 +72,13 @@ public class UserCheckAop {
         }
 
 
-//        // 유저 검증 로직
-//        String userNameUuidCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
-//        BlockedUser blockedUser = blockedService.findBlockedUser(userNameUuidCookie);
-//        if (blockedUser != null && blockedUser.getBlockedUser().equals(userNameUuidCookie)) {
-//            //setBlockCookie(response); // 사전 차단용 쿠키를 세팅
-//            throw new BlockedClientException("blocked user uuid");
-//        }
+        // 유저 검증 로직
+        //String userNameUuidCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
+        User findUser = userService.findUserByUserId(username);
+        if (findUser != null && findUser.isBlockedFlag()) {
+            //setBlockCookie(response); // 사전 차단용 쿠키를 세팅
+            throw new BlockedClientException("차단된 계정입니다.");
+        }
 
         // IP 주소 검증 로직
 //        String userIpAddr = IpTool.getIpAddr(request);
