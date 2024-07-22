@@ -66,7 +66,9 @@ public class NoticeRepositoryImpl implements NoticeRepository {
             log.debug("존재하지 않는 공지사항");
             throw new IllegalArgumentException("검색된 공지사항이 없습니다.");
         }
+        Notice notice = noticeOpt.get();
+        notice.setHits(notice.getHits() + 1);
 
-        return noticeOpt.get();
+        return notice;
     }
 }
