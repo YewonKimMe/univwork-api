@@ -27,23 +27,29 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String senderMailAddress;
 
-    private final Environment environment;
+    @Value("${email.verify.path.host}")
+    private String host;
 
+    @Value("${email.verify.path.url}")
+    private String verifyUrl;
+
+    @Value("${email.password.path.url}")
+    private String findPwdUrl;
+    
     @Async
     public void sendVerifyEmail(String receiverEmailAddress, String authToken) {
 
-        String host = environment.getProperty("email.verify.path.host");
-        String url = environment.getProperty("email.verify.path.url");
-
         StringBuilder sb = new StringBuilder();
         sb.append(host);
-        sb.append(url);
+        sb.append(verifyUrl);
         sb.append("?");
         sb.append("authToken=");
         sb.append(authToken);
         String verifyLink = sb.toString();
 
         log.debug("verifyLink={}", verifyLink);
+        log.debug("receiverEmailAddress={}", receiverEmailAddress);
+        log.debug("email-host={}", senderMailAddress);
         MimeMessage message = emailSender.createMimeMessage();
         try {
             message.setFrom(senderMailAddress);
@@ -65,18 +71,16 @@ public class EmailService {
     @Async
     public void sendPasswordFindEmail(String receiverEmailAddress, String authToken) {
 
-        String host = environment.getProperty("email.verify.path.host");
-        String url = environment.getProperty("email.password.path.url");
-
         StringBuilder sb = new StringBuilder();
         sb.append(host);
-        sb.append(url);
+        sb.append(findPwdUrl);
         sb.append("?");
         sb.append("authToken=");
         sb.append(authToken);
         String verifyLink = sb.toString();
         log.debug("verifyLink={}", verifyLink);
-
+        log.debug("receiverEmailAddress={}", receiverEmailAddress);
+        log.debug("email-host={}", senderMailAddress);
         MimeMessage message = emailSender.createMimeMessage();
         try {
             message.setFrom(senderMailAddress);

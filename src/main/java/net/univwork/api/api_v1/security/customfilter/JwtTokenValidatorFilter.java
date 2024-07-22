@@ -9,8 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.security.SecurityConstants;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -30,6 +29,9 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class JwtTokenValidatorFilter extends OncePerRequestFilter {
 
+    @Value("${mycustom.jwt.secretkey}")
+    private String jwtKey;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // jwt 요청 헤더에서 획득
@@ -45,7 +47,7 @@ public class JwtTokenValidatorFilter extends OncePerRequestFilter {
         if (jwt != null) { // jwt != null 인 경우, 즉 로그인 한 사용자
             try {
                 // 기존 비밀키 생성
-                SecretKey existingKey = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
+                SecretKey existingKey = Keys.hmacShaKeyFor(jwtKey.getBytes(StandardCharsets.UTF_8));
 
                 Claims claims = Jwts.parser()
                         .verifyWith(existingKey) // 기존 비밀키

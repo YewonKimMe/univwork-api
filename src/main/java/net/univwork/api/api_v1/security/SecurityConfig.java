@@ -1,13 +1,13 @@
 package net.univwork.api.api_v1.security;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.enums.Role;
 import net.univwork.api.api_v1.security.customfilter.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -41,6 +41,11 @@ public class SecurityConfig {
 
     private final CustomBasicAuthenticationEntryPoint basicAuthenticationEntryPoint;
 
+    @Value("${cors.allowed-origin.dev}")
+    private String devCorsAllowedUrl;
+
+    @Value("${cors.allowed-origin.prod}")
+    private String prodCorsAllowedUrl;
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
@@ -58,8 +63,8 @@ public class SecurityConfig {
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration config = new CorsConfiguration();
                                 config.setAllowedOrigins(Arrays.asList(
-                                        "http://localhost:3000",
-                                        "https://univwork.pages.dev"
+                                        devCorsAllowedUrl,
+                                        devCorsAllowedUrl
                                 ));
                                 config.setAllowedMethods(Collections.singletonList("*"));
                                 config.setAllowCredentials(true);

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.security.SecurityConstants;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,14 +30,17 @@ import java.util.*;
 @Component
 public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
 
+    @Value("${mycustom.jwt.secretkey}")
+    private String jwtKey;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null) {
-
-            SecretKey secretKey = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
+            log.debug("jwtKey={}", jwtKey);
+            SecretKey secretKey = Keys.hmacShaKeyFor(jwtKey.getBytes(StandardCharsets.UTF_8));
             Instant expirationTime = Instant.now().plus(Duration.ofHours(3)); // 3시간뒤 만료
             String jwt = Jwts.builder()
                     .issuer("univwork.net")
