@@ -43,6 +43,15 @@ public class UserService {
         return userDetailDto;
     }
 
+    public User findUserByUserId(final String userId) {
+        Optional<User> findUserOpt = userRepository.findUserByUserId(userId);
+        if (findUserOpt.isEmpty()) {
+            log.error("USER ID does not exist - parameter userId={}", userId);
+            throw new UserNotExistException("아이디로 검색된 유저가 존재하지 않습니다.");
+        }
+        return findUserOpt.get();
+    }
+
     public UserDetailDto findUserByEmail(final String userEmail) {
         Optional<User> findUserOpt = userRepository.findUserByEmail(userEmail);
         if (findUserOpt.isEmpty()) {
