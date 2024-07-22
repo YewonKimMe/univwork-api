@@ -67,6 +67,7 @@ public class WorkplaceRepositoryImpl implements WorkplaceRepository{
 
         builder.and(workplaceComment.univCode.eq(univCode));
         builder.and(workplaceComment.workplaceCode.eq(workplaceCode));
+        builder.and(workplaceComment.deleteFlag.eq(false));
 
         orderSpecifier = workplaceComment.timestamp.desc();
 
