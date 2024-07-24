@@ -10,13 +10,13 @@ import net.univwork.api.api_v1.enums.CookieName;
 import net.univwork.api.api_v1.exception.BlockedClientException;
 import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.exception.NoRepeatException;
-import net.univwork.api.api_v1.service.BlockedService;
 import net.univwork.api.api_v1.service.UserService;
 import net.univwork.api.api_v1.tool.CookieUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -74,10 +74,14 @@ public class UserCheckAop {
 
         // 유저 검증 로직
         //String userNameUuidCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
-        User findUser = userService.findUserByUserId(username);
-        if (findUser != null && findUser.isBlockedFlag()) {
-            //setBlockCookie(response); // 사전 차단용 쿠키를 세팅
-            throw new BlockedClientException("차단된 계정입니다.");
+        log.debug("isAnonymousUser?={}", authentication instanceof AnonymousAuthenticationToken);
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            User findUser = userService.findUserByUserId(username);
+            if (findUser != null && findUser.isBlockedFlag()) {
+                log.error("차단된 유저 감지 = {}", findUser.getUserId());
+                //setBlockCookie(response); // 사전 차단용 쿠키를 세팅
+                throw new BlockedClientException("차단된 계정입니다.");
+            }
         }
 
         // IP 주소 검증 로직
