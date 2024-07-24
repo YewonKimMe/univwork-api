@@ -64,7 +64,7 @@ public class SecurityConfig {
                                 CorsConfiguration config = new CorsConfiguration();
                                 config.setAllowedOrigins(Arrays.asList(
                                         devCorsAllowedUrl,
-                                        devCorsAllowedUrl
+                                        prodCorsAllowedUrl
                                 ));
                                 config.setAllowedMethods(Collections.singletonList("*"));
                                 config.setAllowCredentials(true);
