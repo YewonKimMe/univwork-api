@@ -117,7 +117,7 @@ public class UnivController {
         Page<WorkplaceSummaryDto> workplacesPage = univService.getWorkplacesSummary(univCode, pageNumber, pageLimit, workplaceSearchKeyword, workplaceType, sortOption);
         PagedModel<EntityModel<WorkplaceSummaryDto>> model = assembler.toModel(workplacesPage);
         return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS))
+                .cacheControl(CacheControl.maxAge(5, TimeUnit.SECONDS))
                 .body(model);
     }
 
@@ -128,7 +128,7 @@ public class UnivController {
                 .toList();
         log.debug("list={}", collect);
         return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(3, TimeUnit.SECONDS))
+                .cacheControl(CacheControl.maxAge(15, TimeUnit.SECONDS))
                 .body(collect);
     }
 }
