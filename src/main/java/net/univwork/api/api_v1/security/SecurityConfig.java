@@ -84,6 +84,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((request) -> request // url path matcher
                         .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.getRole())
                         .requestMatchers("/api/v1/users/**").hasAnyRole(Role.USER.getRole(), Role.ADMIN.getRole())
+                        .requestMatchers("/swagger-ui/**").hasRole(Role.ADMIN.getRole())
                         .requestMatchers("/api/v1/login/**").permitAll()
                         .requestMatchers("/api/v1/sign-up/**").permitAll()
                         .requestMatchers("/api/**", "/**").permitAll())
@@ -91,8 +92,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .httpBasic(configurer -> configurer
-                        .authenticationEntryPoint(basicAuthenticationEntryPoint)
-                );
+                        .authenticationEntryPoint(basicAuthenticationEntryPoint));
         return http.build();
     }
 
