@@ -3,15 +3,17 @@ package net.univwork.api.api_v1.controller.excpetion_advice;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.response.ErrorResultAndMessage;
+import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.exception.*;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Locale;
 
@@ -22,23 +24,6 @@ public class ExceptionAdviceController {
 
     private final MessageSource ms; // message.properties 접근용
 
-//    /**
-//     * API 예외 처리 핸들러_MethodArgumentTypeMismatchException
-//     * @param e MethodArgumentTypeMismatchException
-//     * @return ErrorResultAndMessage
-//     * @see ErrorResultAndMessage
-//     * @apiNote HTTP 요청 시 Method Parameter 에 잘못된 타입의 인자를 전달한 경우 MethodargumentTypeMismatchException 발생
-//     * */
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-//    public ErrorResultAndMessage methodArgTypeMis(MethodArgumentTypeMismatchException e) {
-//        log.debug("[exceptionHandler] ex", e);
-//        // messageSource 에서 message 획득, 틀린 파라미터 인덱스와 파라미터 타입
-//        String message = ms.getMessage("exception.MethodArgumentTypeMismatchExceptionMessage", new Object[]{e.getParameter().getParameterIndex(), e.getParameter().getParameterType()}, Locale.KOREA);
-//
-//        log.debug("message={}", message);
-//        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), message);
-//    }
 
     /**
      * API 예외처리 핸들러_IllegalArgumentException
@@ -47,12 +32,14 @@ public class ExceptionAdviceController {
      * @apiNote 잘못된 인자가 전달된 경우 IllgalArgumentException 발생
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
-    public ErrorResultAndMessage illegalArgEx(IllegalArgumentException e) {
+    public ResponseEntity<ResultAndMessage> illegalArgEx(IllegalArgumentException e) {
         log.debug("IllegalExMessage={}", e.getMessage());
-
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+        ErrorResultAndMessage errorResultAndMessage = new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResultAndMessage);
     }
 
     /**
@@ -63,12 +50,15 @@ public class ExceptionAdviceController {
      * @see net.univwork.api.api_v1.aop.UserCheckAop AOP 발생 예시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(NoUserCodeException.class)
-    public ErrorResultAndMessage noUserCode(NoUserCodeException e) {
+    public ResponseEntity<ResultAndMessage> noUserCode(NoUserCodeException e) {
         log.debug("NoUserCodeExMessage={}", e.getMessage());
 
-        return new ErrorResultAndMessage(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
+        ErrorResultAndMessage errorResultAndMessage = new ErrorResultAndMessage(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResultAndMessage);
     }
 
     /**
@@ -79,11 +69,13 @@ public class ExceptionAdviceController {
      * @see net.univwork.api.api_v1.aop.UserCheckAop AOP 발생 예시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(BlockedClientException.class)
-    public ErrorResultAndMessage blockedCatch(BlockedClientException e) {
+    public ResponseEntity<ResultAndMessage> blockedCatch(BlockedClientException e) {
         log.debug("BlockedClientException={}", e.getMessage());
-        return new ErrorResultAndMessage(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.FORBIDDEN.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -96,8 +88,11 @@ public class ExceptionAdviceController {
      * */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadCredentialsException.class)
-    public ErrorResultAndMessage badCredential(BadCredentialsException e) {
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> badCredential(BadCredentialsException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -107,10 +102,12 @@ public class ExceptionAdviceController {
      * @apiNote 비밀번호 불일치
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(PasswordNotMatchException.class)
-    public ErrorResultAndMessage passwordNotMatches(PasswordNotMatchException e) {
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> passwordNotMatches(PasswordNotMatchException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -120,10 +117,12 @@ public class ExceptionAdviceController {
      * @apiNote DuplicationException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DuplicationException.class)
-    public ErrorResultAndMessage duplication(DuplicationException e) {
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> duplication(DuplicationException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -133,10 +132,13 @@ public class ExceptionAdviceController {
      * @apiNote NoRepeatException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NoRepeatException.class)
-    public ErrorResultAndMessage noRepeat(NoRepeatException e) {
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> noRepeat(NoRepeatException e) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -146,10 +148,12 @@ public class ExceptionAdviceController {
      * @apiNote AlreadyReportedException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AlreadyReportedException.class)
-    public ErrorResultAndMessage alreadyReported(AlreadyReportedException e) {
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> alreadyReported(AlreadyReportedException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -159,10 +163,12 @@ public class ExceptionAdviceController {
      * @apiNote EmailAlreadyExistException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(EmailAlreadyExistException.class)
-    public ErrorResultAndMessage emailAlreadyExist(EmailAlreadyExistException e) {
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> emailAlreadyExist(EmailAlreadyExistException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -172,10 +178,12 @@ public class ExceptionAdviceController {
      * @apiNote NoAuthenticationException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(NoAuthenticationException.class)
-    public ErrorResultAndMessage noAuthentication(NoAuthenticationException e) {
-        return new ErrorResultAndMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> noAuthentication(NoAuthenticationException e) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -185,10 +193,12 @@ public class ExceptionAdviceController {
      * @apiNote UnivEmailNotFountException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(UnivEmailNotFountException.class)
-    public ErrorResultAndMessage univEmailNotFound(UnivEmailNotFountException e) {
-        return new ErrorResultAndMessage(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> univEmailNotFound(UnivEmailNotFountException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -198,10 +208,12 @@ public class ExceptionAdviceController {
      * @apiNote UserAlreadyExistException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(UserAlreadyExistException.class)
-    public ErrorResultAndMessage userAlreadyExist(UserAlreadyExistException e) {
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> userAlreadyExist(UserAlreadyExistException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -211,10 +223,12 @@ public class ExceptionAdviceController {
      * @apiNote UserNotExistException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(UserNotExistException.class)
-    public ErrorResultAndMessage userNotExist(UserNotExistException e) {
-        return new ErrorResultAndMessage(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> userNotExist(UserNotExistException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -224,10 +238,12 @@ public class ExceptionAdviceController {
      * @apiNote DomainNotMatchException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DomainNotMatchException.class)
-    public ErrorResultAndMessage userNotExist(DomainNotMatchException e) {
-        return new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> userNotExist(DomainNotMatchException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage()));
     }
 
     /**
@@ -237,10 +253,13 @@ public class ExceptionAdviceController {
      * @apiNote NoticeNotFoundException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoticeNotFoundException.class)
-    public ErrorResultAndMessage noticeNotFound(NoticeNotFoundException e) {
-        return new ErrorResultAndMessage(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+    public ResponseEntity<ResultAndMessage> noticeNotFound(NoticeNotFoundException e) {
+        ErrorResultAndMessage errorResultAndMessage = new ErrorResultAndMessage(HttpStatus.NOT_FOUND.getReasonPhrase(), e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResultAndMessage);
     }
 
     /**
@@ -250,17 +269,29 @@ public class ExceptionAdviceController {
      * @apiNote RuntimeException 발생 시
      * @see ErrorResultAndMessage
      * */
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(RuntimeException.class)
-    public ErrorResultAndMessage runtimeException(RuntimeException e) {
+    public ResponseEntity<ResultAndMessage> runtimeException(RuntimeException e) {
         log.debug("RuntimeException={}", e.getMessage());
-        return new ErrorResultAndMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), "서버에 오류가 발생했습니다.");
+        ErrorResultAndMessage errorResponse = new ErrorResultAndMessage(
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "서버에 오류가 발생했습니다."
+        );
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse);
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ErrorResultAndMessage internalServerError(Exception e) {
+    public ResponseEntity<ResultAndMessage> internalServerError(Exception e) {
         log.debug("Exception={}", e.getMessage());
-        return new ErrorResultAndMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), "서버에 오류가 발생했습니다.");
+        ErrorResultAndMessage errorResponse = new ErrorResultAndMessage(
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "서버에 오류가 발생했습니다."
+        );
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse);
     }
 }
