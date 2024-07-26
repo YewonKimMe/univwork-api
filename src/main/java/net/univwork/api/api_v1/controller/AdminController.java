@@ -18,6 +18,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
@@ -31,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @Tag(name = "Admin", description = "관리자 기능 관련 엔드포인트")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/admin")
+@RequestMapping(value = "/api/v1/admin", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdminController {
 
     private final AdminService adminService;

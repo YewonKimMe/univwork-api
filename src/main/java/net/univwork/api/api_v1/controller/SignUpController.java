@@ -13,6 +13,7 @@ import net.univwork.api.api_v1.domain.response.SuccessResultAndMessage;
 import net.univwork.api.api_v1.service.RedisService;
 import net.univwork.api.api_v1.service.SingUpService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -28,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Tag(name = "Sign Up", description = "회원가입 관련 기능 엔드포인트")
 @Controller
-@RequestMapping("/api/v1/sign-up")
+@RequestMapping(value = "/api/v1/sign-up", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SignUpController {
 
     private final SingUpService singUpService;

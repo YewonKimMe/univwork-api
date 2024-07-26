@@ -12,6 +12,7 @@ import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.domain.response.SuccessResultAndMessage;
 import net.univwork.api.api_v1.service.CommentService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Comment", description = "댓글 관련 부가 기능 엔드포인트")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/comment")
+@RequestMapping(value = "/api/v1/comment", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CommentController {
 
     private final CommentService commentService;

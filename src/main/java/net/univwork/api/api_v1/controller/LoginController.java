@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.response.SuccessResultAndMessage;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @Tag(name = "Login", description = "Basic Auth Login")
-@RequestMapping("/api/v1/login")
+@RequestMapping(value = "/api/v1/login", produces = MediaType.APPLICATION_JSON_VALUE)
 public class LoginController {
 
     @Operation(summary = "Login", description = "Basic Authentication Login end-point")
