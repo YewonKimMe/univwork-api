@@ -2,14 +2,15 @@ package net.univwork.api.api_v1.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.univwork.api.api_v1.domain.dto.AddWorkplaceDto;
 import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
-import net.univwork.api.api_v1.domain.entity.Notice;
-import net.univwork.api.api_v1.domain.entity.ReportedComment;
-import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
+import net.univwork.api.api_v1.domain.entity.*;
 import net.univwork.api.api_v1.enums.BlockRole;
+import net.univwork.api.api_v1.exception.UnivNotFountException;
 import net.univwork.api.api_v1.repository.AdminRepository;
 import net.univwork.api.api_v1.repository.CommentRepository;
 import net.univwork.api.api_v1.repository.ReportedCommentRepository;
+import net.univwork.api.api_v1.repository.jpa.JpaWorkplaceRepository;
 import net.univwork.api.api_v1.tool.UUIDConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,9 @@ public class AdminService {
 
     private final ReportedCommentRepository reportedCommentRepository;
 
+    private final UnivService univService;
+
+    private final JpaWorkplaceRepository jpaWorkplaceRepository;
 
     // 공지사항 리스트 획득 메소드
     public Page<Notice> getNoticeList(final int pageNumber, final int pageLimit) {
@@ -126,5 +130,31 @@ public class AdminService {
         byte[] uuidBytes = UUIDConverter.convertUuidStringToBinary16(uuidString);
         reportedCommentRepository.makeProgressOver(uuidBytes);
         log.info("[신고 반려] uuid: {}", UUIDConverter.convertBinary16ToUUID(uuidBytes).toString());
+    }
+
+    public void addWorkplace(Long univCode, AddWorkplaceDto dto) {
+        if (null == univService.getUniv(univCode)) {
+            log.debug("[근로지 추가 중 오류] 해당 univCode 로 검색된 대학 존재 X");
+            throw new UnivNotFountException("해당 univCode 로 검색된 대학교가 존재하지 않습니다\nunivCode=" + univCode);
+        }
+        University findUniv = univService.getUniv(univCode);
+        Workplace workplace = new Workplace();
+        workplace.setUnivCode(dto.getUnivCode());
+        workplace.setUnivName(findUniv.getUnivName());
+        workplace.setWorkplaceType(dto.getWorkplaceType());
+        workplace.setWorkType(dto.getWorkType());
+        workplace.setWorkplaceName(dto.getWorkplaceName());
+        workplace.setWorkplaceAddress(dto.getWorkplaceAddress());
+        workplace.setWorkTime(dto.getWorkTime());
+        workplace.setWorkDay(dto.getWorkDay());
+        workplace.setRequiredNum(dto.getRequiredNum());
+        workplace.setPreferredGrade(dto.getPreferredGrade());
+        workplace.setPreferredDepartment(dto.getPreferredDepartment());
+        workplace.setJobDetail(dto.getJobDetail());
+        workplace.setNote(dto.getNote());
+        workplace.setCommentNum(0L);
+        workplace.setViews(0L);
+
+        jpaWorkplaceRepository.save(workplace);
     }
 }
