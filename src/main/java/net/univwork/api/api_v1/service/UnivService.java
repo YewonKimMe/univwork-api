@@ -74,4 +74,12 @@ public class UnivService {
 
         return univRepository.getWorkplacesSummary(pageable, univCode, workplaceName, workplaceType, sortOption);
     }
+
+    /**
+     * countWorkplacePerUniv: 학교별 근로지 갯수를 반환
+     * @param univCode 학교 코드(Long)
+     * */
+    public int countWorkplacePerUniv(Long univCode) {
+        return univRepository.countWorkplacesPerUniv(univCode);
+    }
 }
