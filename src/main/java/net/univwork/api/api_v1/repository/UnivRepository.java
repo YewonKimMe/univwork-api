@@ -46,4 +46,6 @@ public interface UnivRepository {
      * @since 1.0.0
      * */
     Page<WorkplaceSummaryDto> getWorkplacesSummary(Pageable pageable, final Long univCode, @Nullable final String workplaceName, final WorkplaceType workplaceType, final SortOption sortOption);
+
+    int countWorkplacesPerUniv(final Long univCode);
 }

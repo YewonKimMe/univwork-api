@@ -230,4 +230,18 @@ public class UnivRepositoryImpl implements UnivRepository {
                 .where(builder);
         return PageableExecutionUtils.getPage(workplaceSummaryList, pageable,countQuery::fetchOne);
     }
+
+    @Override
+    public int countWorkplacesPerUniv(Long univCode) {
+        QWorkplace workplace = QWorkplace.workplace;
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(workplace.univCode.eq(univCode));
+        Long count = queryFactory
+                .select(workplace.count())
+                .from(workplace)
+                .where(builder)
+                .fetchOne();
+
+        return count != null ? count.intValue() : 0;
+    }
 }
