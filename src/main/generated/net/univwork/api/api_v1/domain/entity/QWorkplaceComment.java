@@ -27,6 +27,8 @@ public class QWorkplaceComment extends EntityPathBase<WorkplaceComment> {
 
     public final BooleanPath deleteFlag = createBoolean("deleteFlag");
 
+    public final NumberPath<Double> rating = createNumber("rating", Double.class);
+
     public final BooleanPath reportFlag = createBoolean("reportFlag");
 
     public final DateTimePath<java.sql.Timestamp> timestamp = createDateTime("timestamp", java.sql.Timestamp.class);

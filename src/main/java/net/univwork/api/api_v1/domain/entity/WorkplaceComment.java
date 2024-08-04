@@ -55,4 +55,7 @@ public class WorkplaceComment {
     @Column
     private String userIp;
 
+    @Column
+    private Double rating;
+
 }

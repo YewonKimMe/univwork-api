@@ -115,6 +115,7 @@ public class WorkplaceService {
         // commentUUID를 바이트배열로 변경
         byte[] commentUuidByte = UUIDConverter.convertUuidToBinary16();
 
+        log.debug("comment dto={}", commentFormDto);
         // WorkplaceComment 생성
         WorkplaceComment workplaceComment = WorkplaceComment.builder()
                 .univCode(univCode)
@@ -128,6 +129,7 @@ public class WorkplaceService {
                 .deleteFlag(false)
                 .reportFlag(false)
                 .userIp(userIp)
+                .rating(commentFormDto.getRating())
                 .build();
 
         // commnent 저장

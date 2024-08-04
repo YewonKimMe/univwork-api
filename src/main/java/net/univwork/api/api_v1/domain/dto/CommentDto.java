@@ -29,6 +29,8 @@ public class CommentDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private Timestamp timestamp;
 
+    private Double rating;
+
     private boolean deleteFlag;
 
     private boolean reportFlag;
@@ -47,6 +49,7 @@ public class CommentDto {
         this.comment = workplaceComment.getComment();
         this.upvote = workplaceComment.getUpvote();
         this.timestamp = workplaceComment.getTimestamp();
+        this.rating = workplaceComment.getRating();
         this.deleteFlag = workplaceComment.isDeleteFlag();
         this.reportFlag = workplaceComment.isReportFlag();
     }
