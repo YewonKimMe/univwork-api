@@ -2,9 +2,11 @@ package net.univwork.api.api_v1.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.univwork.api.api_v1.domain.dto.AddWorkplaceDto;
 import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
 import net.univwork.api.api_v1.domain.entity.Notice;
 import net.univwork.api.api_v1.domain.entity.ReportedComment;
@@ -12,6 +14,7 @@ import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.domain.response.SuccessResultAndMessage;
 import net.univwork.api.api_v1.enums.BlockRole;
 import net.univwork.api.api_v1.service.AdminService;
+import net.univwork.api.api_v1.tool.WorkplaceExcelFileParser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -23,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -36,6 +40,8 @@ import java.util.concurrent.TimeUnit;
 public class AdminController {
 
     private final AdminService adminService;
+
+    private final WorkplaceExcelFileParser excelFileParser;
 
     @Operation(summary = "관리자 권한 확인", description = "최초 접속 시 관리자 권한 확인, ADMIN")
     @GetMapping
@@ -139,6 +145,24 @@ public class AdminController {
         return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), commentId + " 의 신고가 반려되었습니다."));
     }
 
+    @Operation(summary = "근로지 엑셀 파일 등록", description = "근로지 엑셀 파일을 등록하는 API")
+    @PostMapping(value = "/workplaces/add-workplaces", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResultAndMessage> addWorkplacesToExcel(
+            @Parameter(
+                    description = "근로지 엑셀 파일, 양식 확인 필수",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+            )@RequestPart("multipartFile") MultipartFile file,
+            @Parameter(name = "univCode", description = "학교 코드") @RequestParam(name = "univCode") Long univCode) {
+        excelFileParser.readExcel(file, univCode);
+        return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "근로지가 등록됨"));
+    }
 
-
+    @Operation(summary = "근로지 개별 등록", description = "근로지 개별 등록하는 API")
+    @PostMapping(value = "/workplaces/{univCode}")
+    public ResponseEntity<ResultAndMessage> addWorkplace(@Parameter(name = "univCode", description = "univCode") @PathVariable(name = "univCode") Long univCode,
+                                                         @RequestBody AddWorkplaceDto dto) {
+        adminService.addWorkplace(univCode, dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new SuccessResultAndMessage(HttpStatus.CREATED.getReasonPhrase(), "근로지 추가됨"));
+    }
 }
