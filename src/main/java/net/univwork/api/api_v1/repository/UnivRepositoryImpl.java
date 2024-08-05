@@ -215,7 +215,7 @@ public class UnivRepositoryImpl implements UnivRepository {
 
         // 조건에 맞는 workplace를 가져옴
         List<WorkplaceSummaryDto> workplaceSummaryList = queryFactory
-                .select(Projections.constructor(WorkplaceSummaryDto.class, workplace.univCode, workplace.workplaceCode, workplace.univName, workplace.workplaceName, workplace.workType, workplace.workplaceType, workplace.views, workplace.commentNum))
+                .select(Projections.constructor(WorkplaceSummaryDto.class, workplace.univCode, workplace.workplaceCode, workplace.univName, workplace.workplaceName, workplace.workType, workplace.workplaceType, workplace.views, workplace.commentNum, workplace.rating))
                 .from(workplace)
                 .where(builder)
                 .orderBy(orderSpecifier)
