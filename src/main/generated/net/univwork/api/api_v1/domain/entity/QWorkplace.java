@@ -29,6 +29,8 @@ public class QWorkplace extends EntityPathBase<Workplace> {
 
     public final StringPath preferredGrade = createString("preferredGrade");
 
+    public final NumberPath<Double> rating = createNumber("rating", Double.class);
+
     public final StringPath requiredNum = createString("requiredNum");
 
     public final NumberPath<Long> univCode = createNumber("univCode", Long.class);
