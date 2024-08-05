@@ -56,6 +56,9 @@ public class Workplace {
     @Column
     private Long commentNum;
 
+    @Column
+    private Double rating;
+
     public Workplace() {
     }
 }
