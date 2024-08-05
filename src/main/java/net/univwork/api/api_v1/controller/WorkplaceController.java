@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.CommentDto;
 import net.univwork.api.api_v1.domain.dto.CommentFormDto;
 import net.univwork.api.api_v1.domain.dto.WorkplaceDetailDto;
+import net.univwork.api.api_v1.domain.dto.WorkplaceRatingDto;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.enums.CookieName;
 import net.univwork.api.api_v1.exception.DuplicationException;
@@ -81,14 +82,17 @@ public class WorkplaceController {
         // 근로지 댓글 페이지 획득
         Page<CommentDto> workplaceComments = service.getWorkplaceComments(univCode, workplaceCode, pageNumber, pageLimit, authentication);
 
+        // 근로지 rating 획득
+        WorkplaceRatingDto workplaceRatingDto = service.calculateRatingResult(univCode, workplaceCode);
+
         // PagedModel
         PagedModel<EntityModel<CommentDto>> model = assembler.toModel(workplaceComments);
 
         // 복합 객체 생성
-        WorkplaceDetailDto workplaceDetailDto = new WorkplaceDetailDto(workplace, model);
+        WorkplaceDetailDto workplaceDetailDto = new WorkplaceDetailDto(workplace, workplaceRatingDto, model);
 
         return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(3, TimeUnit.SECONDS))
+                .cacheControl(CacheControl.maxAge(4, TimeUnit.SECONDS))
                 .body(workplaceDetailDto);
     }
 
