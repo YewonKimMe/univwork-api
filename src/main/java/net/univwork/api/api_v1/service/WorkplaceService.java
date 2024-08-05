@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.CommentDto;
 import net.univwork.api.api_v1.domain.dto.CommentFormDto;
 import net.univwork.api.api_v1.domain.dto.UserDetailDto;
+import net.univwork.api.api_v1.domain.dto.WorkplaceRatingDto;
 import net.univwork.api.api_v1.domain.entity.University;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
@@ -142,5 +143,30 @@ public class WorkplaceService {
     public int countUserComments(Authentication authentication, final Long univCode, final Long workplaceCode) {
         String userId = authentication.getName();
         return repository.countUserComments(userId, univCode, workplaceCode);
+    }
+
+    // count comment rating
+    public int countCommentRating(Long univCode, Long workplaceCode) {
+        return repository.countCommentRating(univCode, workplaceCode);
+    }
+
+    // sum comment rating
+    public Double sumCommentRating(Long univCode, Long workplaceCode) {
+        return repository.sumCommentRating(univCode, workplaceCode);
+    }
+
+    // calculate rating average
+    public WorkplaceRatingDto calculateRatingResult(Long univCode, Long workplaceCode) {
+
+        Double sumRating = this.sumCommentRating(univCode, workplaceCode);
+
+        if (sumRating == null) {
+            return new WorkplaceRatingDto(0.0, 0);
+        }
+
+        int ratingCount = this.countCommentRating(univCode, workplaceCode);
+        double ratingAverage = Math.round((sumRating / ratingCount) * 100) / 100.0;
+
+        return new WorkplaceRatingDto(ratingAverage, ratingCount);
     }
 }
