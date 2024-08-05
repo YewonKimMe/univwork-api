@@ -16,10 +16,13 @@ public class WorkplaceDetailDto {
 
     private Workplace workplace;
 
+    private WorkplaceRatingDto workplaceRatingDto;
+
     private PagedModel<EntityModel<CommentDto>> workplaceComment;
 
-    public WorkplaceDetailDto(Workplace workplace, PagedModel<EntityModel<CommentDto>> workplaceComment) {
+    public WorkplaceDetailDto(Workplace workplace, WorkplaceRatingDto workplaceRatingDto, PagedModel<EntityModel<CommentDto>> workplaceComment) {
         this.workplace = workplace;
+        this.workplaceRatingDto = workplaceRatingDto;
         this.workplaceComment = workplaceComment;
     }
 }
