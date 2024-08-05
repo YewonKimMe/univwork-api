@@ -8,12 +8,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.AddWorkplaceDto;
 import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
+import net.univwork.api.api_v1.domain.dto.SignUpFormDto;
 import net.univwork.api.api_v1.domain.entity.Notice;
 import net.univwork.api.api_v1.domain.entity.ReportedComment;
 import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.domain.response.SuccessResultAndMessage;
 import net.univwork.api.api_v1.enums.BlockRole;
 import net.univwork.api.api_v1.service.AdminService;
+import net.univwork.api.api_v1.service.SingUpService;
 import net.univwork.api.api_v1.tool.WorkplaceExcelFileParser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -40,6 +42,8 @@ import java.util.concurrent.TimeUnit;
 public class AdminController {
 
     private final AdminService adminService;
+
+    private final SingUpService singUpService;
 
     private final WorkplaceExcelFileParser excelFileParser;
 
@@ -164,5 +168,16 @@ public class AdminController {
         adminService.addWorkplace(univCode, dto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new SuccessResultAndMessage(HttpStatus.CREATED.getReasonPhrase(), "근로지 추가됨"));
+    }
+
+    @Operation(summary = "유저 개별 등록", description = "유저 개별 등록하는 API")
+    @PostMapping(value = "/user/added")
+    public ResponseEntity<ResultAndMessage> addUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "회원 등록 폼") @Validated @RequestBody SignUpFormDto signUpFormDto) {
+        // 가입 과정에서 SignUpController 의 id, email 중복 check 필수(프론트 처리)
+        adminService.addUser(signUpFormDto);
+
+        return ResponseEntity.
+                status(HttpStatus.CREATED)
+                .body(new SuccessResultAndMessage(HttpStatus.CREATED.getReasonPhrase(), "유저 아이디=" + signUpFormDto.getId() + " 유저가 생성됨"));
     }
 }

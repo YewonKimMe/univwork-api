@@ -4,23 +4,29 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.AddWorkplaceDto;
 import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
+import net.univwork.api.api_v1.domain.dto.SignUpFormDto;
 import net.univwork.api.api_v1.domain.entity.*;
 import net.univwork.api.api_v1.enums.BlockRole;
+import net.univwork.api.api_v1.enums.Role;
 import net.univwork.api.api_v1.exception.UnivNotFountException;
 import net.univwork.api.api_v1.repository.AdminRepository;
 import net.univwork.api.api_v1.repository.CommentRepository;
 import net.univwork.api.api_v1.repository.ReportedCommentRepository;
+import net.univwork.api.api_v1.repository.jpa.JpaUserRepository;
 import net.univwork.api.api_v1.repository.jpa.JpaWorkplaceRepository;
 import net.univwork.api.api_v1.tool.UUIDConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -38,6 +44,10 @@ public class AdminService {
     private final UnivService univService;
 
     private final JpaWorkplaceRepository jpaWorkplaceRepository;
+
+    private final JpaUserRepository jpaUserRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     // 공지사항 리스트 획득 메소드
     public Page<Notice> getNoticeList(final int pageNumber, final int pageLimit) {
@@ -156,5 +166,37 @@ public class AdminService {
         workplace.setViews(0L);
 
         jpaWorkplaceRepository.save(workplace);
+    }
+
+    public void addUser(SignUpFormDto signUpFormDto) {
+        String hashedPw = passwordEncoder.encode(signUpFormDto.getPassword()); // 비밀번호 해싱
+        String userUnivDomain = signUpFormDto.getEmail().split("@")[1]; // 이메일 도메인 획득
+
+        // 유저 엔티티 생성
+        User user = User.builder()
+                .userId(signUpFormDto.getId())
+                .email(signUpFormDto.getEmail())
+                .pwd(hashedPw)
+                .role(Role.PREFIX.getRole() + Role.USER.getRole())
+                .createDate(new Timestamp(System.currentTimeMillis()))
+                .verification(true)
+                .univDomain(userUnivDomain)
+                .authorities(new HashSet<>())
+                .blockedFlag(false)
+                .build();
+
+        // Authority 생성
+        Authority authority = Authority.builder()
+                .name("ROLE_USER")
+                .build();
+
+        // 양방향 관계 설정
+        authority.setUser(user); // user와 authority 연결
+        user.getAuthorities().add(authority); // user에 authority 추가
+
+        // 유저 등록
+        jpaUserRepository.save(user); // save 후에 user 객체에 자동으로 생성된 no 값이 채워짐
+
+        log.info("[User create - id: {}, date: {}]", signUpFormDto.getId(), new Timestamp(System.currentTimeMillis()));
     }
 }
