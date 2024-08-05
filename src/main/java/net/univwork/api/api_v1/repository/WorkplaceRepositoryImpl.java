@@ -114,4 +114,37 @@ public class WorkplaceRepositoryImpl implements WorkplaceRepository{
     public int countUserComments(final String userId, final Long univCode, final Long workplaceCode) {
         return jpaWorkplaceCommentRepository.countWorkplaceCommentsByUserIdAndUnivCodeAndWorkplaceCode(userId, univCode, workplaceCode);
     }
+
+    @Override
+    public int countCommentRating(Long univCode, Long workplaceCode) {
+        QWorkplaceComment workplaceComment = QWorkplaceComment.workplaceComment;
+        BooleanBuilder builder = new BooleanBuilder(); // 조건
+
+        builder.and(workplaceComment.rating.isNotNull());
+        builder.and(workplaceComment.univCode.eq(univCode));
+        builder.and(workplaceComment.workplaceCode.eq(workplaceCode));
+        Long cnt = queryFactory
+                .select(workplaceComment.count())
+                .from(workplaceComment)
+                .where(builder)
+                .fetchOne();
+        return cnt != null ? cnt.intValue() : 0;
+    }
+
+    @Override
+    public Double sumCommentRating(Long univCode, Long workplaceCode) {
+
+        QWorkplaceComment workplaceComment = QWorkplaceComment.workplaceComment;
+        BooleanBuilder builder = new BooleanBuilder(); // 조건
+
+        builder.and(workplaceComment.rating.isNotNull());
+        builder.and(workplaceComment.univCode.eq(univCode));
+        builder.and(workplaceComment.workplaceCode.eq(workplaceCode));
+
+        return queryFactory
+                .select(workplaceComment.rating.sum())
+                .from(workplaceComment)
+                .where(builder)
+                .fetchOne();
+    }
 }
