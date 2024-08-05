@@ -136,6 +136,13 @@ public class WorkplaceService {
         // commnent 저장
         WorkplaceComment comment = repository.saveWorkplaceComment(workplaceComment);
         log.debug("saved comment={}", comment);
+
+        // 댓글 갯수 update
+        findWorkplace.setCommentNum(findWorkplace.getCommentNum() + 1);
+
+        // workplace rating update
+        this.updateWorkplaceRating(univCode, workplaceCode, findWorkplace);
+
         // CommentDto로 변환해서 반환
         return new CommentDto(comment); // 나중에 MapStruct 쓰자
     }
@@ -168,5 +175,15 @@ public class WorkplaceService {
         double ratingAverage = Math.round((sumRating / ratingCount) * 100) / 100.0;
 
         return new WorkplaceRatingDto(ratingAverage, ratingCount);
+    }
+
+    private void updateWorkplaceRating(final Long univCode, final Long workplaceCode, Workplace findWorkplace) {
+        Double calculatedAveragedRating = this.calculateRatingResult(univCode, workplaceCode).getAverage(); // 댓글 저장 후 평균평점 계산
+
+        findWorkplace.setRating(calculatedAveragedRating); // rating update
+
+        log.debug("findWorkplace before={}", findWorkplace);
+        log.debug("ratingAvg={}", calculatedAveragedRating);
+        log.debug("findWorkplace after={}", findWorkplace);
     }
 }
