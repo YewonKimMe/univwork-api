@@ -42,4 +42,10 @@ public interface WorkplaceRepository {
     WorkplaceComment saveWorkplaceComment(WorkplaceComment comment);
 
     int countUserComments(final String userId, final Long univCode, final Long workplaceCode);
+
+    int countCommentRating(Long univCode, Long workplaceCode);
+
+    Double sumCommentRating(Long univCode, Long workplaceCode);
+
+
 }
