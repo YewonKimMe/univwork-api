@@ -26,4 +26,6 @@ public class WorkplaceSummaryDto {
     private Long views;
 
     private Long commentNum;
+
+    private Double rating;
 }
