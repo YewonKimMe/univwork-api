@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.AddWorkplaceDto;
 import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
+import net.univwork.api.api_v1.domain.dto.SignUpEmailDto;
 import net.univwork.api.api_v1.domain.dto.SignUpFormDto;
 import net.univwork.api.api_v1.domain.entity.Notice;
 import net.univwork.api.api_v1.domain.entity.ReportedComment;
@@ -179,5 +180,14 @@ public class AdminController {
         return ResponseEntity.
                 status(HttpStatus.CREATED)
                 .body(new SuccessResultAndMessage(HttpStatus.CREATED.getReasonPhrase(), "유저 아이디=" + signUpFormDto.getId() + " 유저가 생성됨"));
+    }
+
+    @Operation(summary = "인증 메일 발송", description = "관리자 권한으로 인증 메일을 재발송 하는 API")
+    @PostMapping(value = "/user/resend-verify-univ-email")
+    public ResponseEntity<ResultAndMessage> reVerifyByAdmin(@RequestBody SignUpEmailDto emailDto) {
+        adminService.sendVerifyEmail(emailDto);
+        return ResponseEntity
+                .ok()
+                .body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "관리자 권한으로 유저 이메일 인증메일 발송됨"));
     }
 }
