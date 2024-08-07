@@ -41,7 +41,7 @@ public class FindPasswordService {
 
         String uuid = UUID.randomUUID().toString();
         redisService.save(uuid, email, 10, TimeUnit.MINUTES);
-        emailService.sendPasswordFindEmail(email, uuid);
+        emailService.sendPasswordFindEmail(email, uuid, 10);
         log.info("Password change request email sent, UserEmail={}", email);
     }
 
