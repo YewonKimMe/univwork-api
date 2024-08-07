@@ -9,12 +9,9 @@ import net.univwork.api.api_v1.domain.response.ResultAndMessage;
 import net.univwork.api.api_v1.tool.IpTool;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Base64Utils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
