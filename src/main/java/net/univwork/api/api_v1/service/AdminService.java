@@ -2,10 +2,7 @@ package net.univwork.api.api_v1.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.univwork.api.api_v1.domain.dto.AddWorkplaceDto;
-import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
-import net.univwork.api.api_v1.domain.dto.SignUpEmailDto;
-import net.univwork.api.api_v1.domain.dto.SignUpFormDto;
+import net.univwork.api.api_v1.domain.dto.*;
 import net.univwork.api.api_v1.domain.entity.*;
 import net.univwork.api.api_v1.enums.BlockRole;
 import net.univwork.api.api_v1.enums.Role;
@@ -211,5 +208,12 @@ public class AdminService {
         emailService.sendVerifyEmail(emailDto.getEmail(), authToken, 3);
         redisService.saveIfAbsent(authToken, emailDto.getEmail(), 3, TimeUnit.HOURS);
         log.info("[관리자-유저 재인증 메일 발송], UserEmail={} Time={}", emailDto.getEmail(), new Timestamp(System.currentTimeMillis()));
+    }
+
+    public Page<AdminAspectUserDetailDto> getUserList(int pageNumber, int pageLimit, String username) {
+
+        Pageable pageable = PageRequest.of(pageNumber, pageLimit);
+
+        return adminRepository.getUserList(pageable, username);
     }
 }

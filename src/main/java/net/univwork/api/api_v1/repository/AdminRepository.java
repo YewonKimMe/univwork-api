@@ -1,5 +1,6 @@
 package net.univwork.api.api_v1.repository;
 
+import net.univwork.api.api_v1.domain.dto.AdminAspectUserDetailDto;
 import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
 import net.univwork.api.api_v1.domain.entity.Notice;
 import net.univwork.api.api_v1.domain.entity.ReportedComment;
@@ -21,4 +22,6 @@ public interface AdminRepository {
     Page<ReportedComment> getReportedCommentList(Pageable pageable);
 
     void blockUser(String userId);
+
+    Page<AdminAspectUserDetailDto> getUserList(Pageable pageable, String username);
 }
