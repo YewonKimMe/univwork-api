@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.AddWorkplaceDto;
 import net.univwork.api.api_v1.domain.dto.NoticeAdminDto;
+import net.univwork.api.api_v1.domain.dto.SignUpEmailDto;
 import net.univwork.api.api_v1.domain.dto.SignUpFormDto;
 import net.univwork.api.api_v1.domain.entity.*;
 import net.univwork.api.api_v1.enums.BlockRole;
@@ -28,6 +29,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -48,6 +50,10 @@ public class AdminService {
     private final JpaUserRepository jpaUserRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final EmailService emailService;
+
+    private final RedisService redisService;
 
     // 공지사항 리스트 획득 메소드
     public Page<Notice> getNoticeList(final int pageNumber, final int pageLimit) {
@@ -198,5 +204,12 @@ public class AdminService {
         jpaUserRepository.save(user); // save 후에 user 객체에 자동으로 생성된 no 값이 채워짐
 
         log.info("[User create - id: {}, date: {}]", signUpFormDto.getId(), new Timestamp(System.currentTimeMillis()));
+    }
+
+    public void sendVerifyEmail(SignUpEmailDto emailDto) {
+        String authToken = UUID.randomUUID().toString();
+        emailService.sendVerifyEmail(emailDto.getEmail(), authToken, 3);
+        redisService.saveIfAbsent(authToken, emailDto.getEmail(), 3, TimeUnit.HOURS);
+        log.info("[관리자-유저 재인증 메일 발송], UserEmail={} Time={}", emailDto.getEmail(), new Timestamp(System.currentTimeMillis()));
     }
 }
