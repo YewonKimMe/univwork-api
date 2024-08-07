@@ -5,8 +5,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.univwork.api.api_v1.domain.entity.Authority;
 import net.univwork.api.api_v1.domain.entity.User;
 import net.univwork.api.api_v1.enums.CookieName;
+import net.univwork.api.api_v1.enums.Role;
 import net.univwork.api.api_v1.exception.BlockedClientException;
 import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.exception.NoRepeatException;
@@ -22,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -78,9 +81,22 @@ public class UserCheckAop {
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             User findUser = userService.findUserByUserId(username);
             if (findUser != null && findUser.isBlockedFlag()) {
+                Set<Authority> authorities = findUser.getAuthorities();
+                boolean isNotAdmin = true;
+                for (Authority authority : authorities) {
+                    if (authority.getName().equals(Role.PREFIX.getRole() + Role.ADMIN.getRole())) {
+                        log.debug("Role.PREFIX.getRole() + Role.ADMIN.getRole() = {}", Role.PREFIX.getRole() + Role.ADMIN.getRole());
+
+                        log.info("[관리자 요청] 차단 적용 무시, username={}, role={}", authority.getUser().getUserId(), authority.getName());
+                        isNotAdmin = false;
+                        break;
+                    }
+                }
                 log.error("차단된 유저 감지 = {}", findUser.getUserId());
                 //setBlockCookie(response); // 사전 차단용 쿠키를 세팅
-                throw new BlockedClientException("차단된 계정입니다.");
+                if (isNotAdmin) {
+                    throw new BlockedClientException("차단된 계정입니다.");
+                }
             }
         }
 
