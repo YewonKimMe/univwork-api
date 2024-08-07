@@ -9,7 +9,9 @@ public enum CookieName {
 
     BLOCKED_FIRST_CHECK_COOKIE("K4F3S1F4528P12MKO41ZZX0"),
 
-    REPEAT_REQUEST("SPECEDCONNECTION");
+    REPEAT_REQUEST("SPECEDCONNECTION"),
+
+    FIND_PASSWORD_EMAIL("_fa_40123f84723ci");
 
     private final String cookieName;
 
