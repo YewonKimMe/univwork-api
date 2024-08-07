@@ -196,6 +196,18 @@ public class AdminController {
                 .body(model);
     }
 
+    @Operation(summary = "유저 인증 처리", description = "유저 인증 완료 처리 API")
+    @PatchMapping("/users/verify")
+    public ResponseEntity<ResultAndMessage> verifyUserByUserEmail(@RequestBody SignUpEmailDto emailDto) {
+
+        // verify update 처리 로직
+        adminService.setUserVerified(emailDto.getEmail());
+
+        return ResponseEntity
+                .ok()
+                .body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), emailDto.getEmail() + "유저 인증 정보가 [인증완료] 로 갱신됨."));
+    }
+
 
 
     @Operation(summary = "인증 메일 발송", description = "관리자 권한으로 인증 메일을 재발송 하는 API")
