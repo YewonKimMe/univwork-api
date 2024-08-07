@@ -232,4 +232,28 @@ public class AdminService {
 
         log.info("[관리자-유저 인증 정보 설정] Email={} 유저의 인증 정보가 인증됨 으로 설정", email);
     }
+
+    public void setUserBlocked(String email) {
+        Optional<User> findUserOpt = userRepository.findUserByEmail(email);
+
+        if (findUserOpt.isEmpty()) {
+            throw new UserNotExistException("해당 이메일로 검색된 유저가 없습니다.");
+        }
+        User user = findUserOpt.get();
+        user.setBlockedFlag(true);
+
+        log.info("[관리자-유저 인증 정보 설정] Email={} 유저 [차단] 실행", email);
+    }
+
+    public void setUserBlockedRelease(String email) {
+        Optional<User> findUserOpt = userRepository.findUserByEmail(email);
+
+        if (findUserOpt.isEmpty()) {
+            throw new UserNotExistException("해당 이메일로 검색된 유저가 없습니다.");
+        }
+        User user = findUserOpt.get();
+        user.setBlockedFlag(true);
+
+        log.info("[관리자-유저 인증 정보 설정] Email={} 유저 [차단 해제] 실행", email);
+    }
 }
