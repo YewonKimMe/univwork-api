@@ -72,7 +72,7 @@ public class SingUpService {
         redisService.save(authToken, signUpFormDto.getEmail(), 48, TimeUnit.HOURS);
 
         // 이메일 발송
-        emailService.sendVerifyEmail(signUpFormDto.getEmail(), authToken);
+        emailService.sendVerifyEmail(signUpFormDto.getEmail(), authToken, 48);
     }
 
     public String checkValidUnivEmailAddr(SignUpEmailDto emailDto) {
