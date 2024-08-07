@@ -7,9 +7,11 @@ import net.univwork.api.api_v1.domain.entity.*;
 import net.univwork.api.api_v1.enums.BlockRole;
 import net.univwork.api.api_v1.enums.Role;
 import net.univwork.api.api_v1.exception.UnivNotFountException;
+import net.univwork.api.api_v1.exception.UserNotExistException;
 import net.univwork.api.api_v1.repository.AdminRepository;
 import net.univwork.api.api_v1.repository.CommentRepository;
 import net.univwork.api.api_v1.repository.ReportedCommentRepository;
+import net.univwork.api.api_v1.repository.UserRepository;
 import net.univwork.api.api_v1.repository.jpa.JpaUserRepository;
 import net.univwork.api.api_v1.repository.jpa.JpaWorkplaceRepository;
 import net.univwork.api.api_v1.tool.UUIDConverter;
@@ -39,6 +41,8 @@ public class AdminService {
     private final CommentRepository commentRepository;
 
     private final ReportedCommentRepository reportedCommentRepository;
+
+    private final UserRepository userRepository;
 
     private final UnivService univService;
 
@@ -215,5 +219,17 @@ public class AdminService {
         Pageable pageable = PageRequest.of(pageNumber, pageLimit);
 
         return adminRepository.getUserList(pageable, username);
+    }
+
+    public void setUserVerified(String email) {
+        Optional<User> findUserOpt = userRepository.findUserByEmail(email);
+
+        if (findUserOpt.isEmpty()) {
+            throw new UserNotExistException("해당 이메일로 검색된 유저가 없습니다.");
+        }
+        User user = findUserOpt.get();
+        user.setVerification(true);
+
+        log.info("[관리자-유저 인증 정보 설정] Email={} 유저의 인증 정보가 인증됨 으로 설정", email);
     }
 }
