@@ -208,7 +208,27 @@ public class AdminController {
                 .body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), emailDto.getEmail() + "유저 인증 정보가 [인증완료] 로 갱신됨."));
     }
 
+    @Operation(summary = "유저 차단 처리", description = "유저 차단 처리 API")
+    @PatchMapping("/users/block")
+    public ResponseEntity<ResultAndMessage> blockUserByUserEmail(@RequestBody SignUpEmailDto emailDto) {
 
+        // block update 처리 로직
+        adminService.setUserBlocked(emailDto.getEmail());
+        return ResponseEntity
+                .ok()
+                .body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), emailDto.getEmail() + "유저가 [차단] 처리됨."));
+    }
+
+    @Operation(summary = "유저 차단 해제", description = "유저 차단 해제 API")
+    @PatchMapping("/users/release")
+    public ResponseEntity<ResultAndMessage> releaseUserByUserEmail(@RequestBody SignUpEmailDto emailDto) {
+
+        // block update 처리 로직
+        adminService.setUserBlockedRelease(emailDto.getEmail());
+        return ResponseEntity
+                .ok()
+                .body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), emailDto.getEmail() + "유저가 [차단 해제] 처리됨."));
+    }
 
     @Operation(summary = "인증 메일 발송", description = "관리자 권한으로 인증 메일을 재발송 하는 API")
     @PostMapping(value = "/user/resend-verify-univ-email")
