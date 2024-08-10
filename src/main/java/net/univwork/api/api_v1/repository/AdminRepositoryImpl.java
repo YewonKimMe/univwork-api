@@ -113,7 +113,7 @@ public class AdminRepositoryImpl implements AdminRepository {
         BooleanBuilder builder = new BooleanBuilder(); // 조건
         OrderSpecifier<?> orderSpecifier = null; // 정렬
 
-        if (username != null) {
+        if (username != null && !username.isEmpty()) {
             builder.and(user.userId.eq(username));
         }
         orderSpecifier = user.No.asc();
