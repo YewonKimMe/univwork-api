@@ -27,7 +27,7 @@ public class UserService {
     public UserDetailDto findUserById(final String userId) {
         Optional<User> findUserOpt = userRepository.findUserByUserId(userId);
         if (findUserOpt.isEmpty()) {
-            log.error("USER ID does not exist - parameter userId={}", userId);
+            log.error("findUserById-USER ID does not exist - parameter userId={}", userId);
             throw new UserNotExistException("아이디로 검색된 유저가 존재하지 않습니다.");
         }
         User user = findUserOpt.get();
@@ -46,28 +46,20 @@ public class UserService {
     public User findUserByUserId(final String userId) {
         Optional<User> findUserOpt = userRepository.findUserByUserId(userId);
         if (findUserOpt.isEmpty()) {
-            log.error("USER ID does not exist - parameter userId={}", userId);
+            log.error("findUserByUserId-USER ID does not exist - parameter userId={}", userId);
             throw new UserNotExistException("아이디로 검색된 유저가 존재하지 않습니다.");
         }
         return findUserOpt.get();
     }
 
-    public UserDetailDto findUserByEmail(final String userEmail) {
+    public User findUserByEmail(final String userEmail) {
         Optional<User> findUserOpt = userRepository.findUserByEmail(userEmail);
         if (findUserOpt.isEmpty()) {
             log.error("USER EMAIL does not exist - parameter email={}", userEmail);
             throw new UserNotExistException("이메일으로 검색된 유저가 존재하지 않습니다.");
         }
-        User user = findUserOpt.get();
 
-        UserDetailDto userDetailDto = UserDetailDto.builder()
-                .userId(user.getUserId())
-                .email(user.getEmail())
-                .univ(UnivEmailDomain.checkDomainFromString(user.getUnivDomain()))
-                .createDate(user.getCreateDate().toLocalDateTime())
-                .verification(user.isVerification())
-                .build();
-        return userDetailDto;
+        return findUserOpt.get();
     }
 
     public int updateUserPassword(final String userId, final String rawCurrentPwd, final String rawNewPwd) {
