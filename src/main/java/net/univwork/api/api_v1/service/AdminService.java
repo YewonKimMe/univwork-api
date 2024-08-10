@@ -252,7 +252,7 @@ public class AdminService {
             throw new UserNotExistException("해당 이메일로 검색된 유저가 없습니다.");
         }
         User user = findUserOpt.get();
-        user.setBlockedFlag(true);
+        user.setBlockedFlag(false);
 
         log.info("[관리자-유저 인증 정보 설정] Email={} 유저 [차단 해제] 실행", email);
     }
