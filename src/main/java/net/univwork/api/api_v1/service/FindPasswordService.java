@@ -25,6 +25,8 @@ public class FindPasswordService {
 
     private final UserRepository userRepository;
 
+    private final UserService userService;
+
     private final PasswordEncoder passwordEncoder;
 
     private final String message = "해당 이메일로 검색된 계정이 없습니다.";
@@ -50,7 +52,8 @@ public class FindPasswordService {
         if (userEmail == null) {
             throw new IllegalArgumentException("인증 토큰이 만료되었거나 유효하지 않습니다.");
         }
-        return userEmail;
+        String userId = userService.findUserByEmail(userEmail).getUserId();
+        return "Login ID: " + userId + ", " + "이메일: " + userEmail;
     }
 
     // auth token 기반 으로 검증
