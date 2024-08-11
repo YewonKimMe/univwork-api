@@ -50,7 +50,7 @@ public class WorkplaceExcelFileParser {
                 Row row = sheet.getRow(r); // 행 획득
                 int numberOfColumns = row.getPhysicalNumberOfCells();
                 log.debug("columns={}", numberOfColumns);
-                if (numberOfColumns != 11) {
+                if (numberOfColumns != 12) {
                     throw new IllegalArgumentException("잘못된 양식의 엑셀 파일 입니다.");
                 }
                 Workplace workplace = new Workplace();
@@ -99,6 +99,12 @@ public class WorkplaceExcelFileParser {
 
                         // 비고
                         case 10 -> workplace.setNote(cellValue);
+
+                        // lat
+                        case 11 -> workplace.setLat(Double.valueOf(cellValue));
+
+                        // lng
+                        case 12 -> workplace.setLng(Double.valueOf(cellValue));
 
                         default -> throw new RuntimeException("올바르지 않은 셀 번호");
                     }
