@@ -59,6 +59,10 @@ public class Workplace {
     @Column
     private Double rating;
 
+    private Double lat;
+
+    private Double lng;
+
     public Workplace() {
     }
 }

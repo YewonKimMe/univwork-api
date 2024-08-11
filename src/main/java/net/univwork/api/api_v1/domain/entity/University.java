@@ -31,6 +31,9 @@ public class University {
     @Column
     private Integer workplaceNum;
 
+    private Double lat;
+
+    private Double lng;
     public University() {
     }
 }
