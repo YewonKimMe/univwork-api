@@ -61,7 +61,7 @@ public class MapRepository {
         builder.and(workplace.lat.isNotNull());
         builder.and(workplace.lng.isNotNull());
         return queryFactory
-                .select(Projections.constructor(WorkplaceMapDto.class, workplace.workplaceCode, workplace.univCode, workplace.univName, workplace.workplaceType, workplace.workplaceType, workplace.workplaceName, workplace.workplaceAddress, workplace.rating, workplace.lat, workplace.lng))
+                .select(Projections.constructor(WorkplaceMapDto.class, workplace.workplaceCode, workplace.univCode, workplace.univName, workplace.workplaceType, workplace.workplaceType, workplace.workplaceName, workplace.workplaceAddress, workplace.commentNum, workplace.rating, workplace.lat, workplace.lng))
                 .from(workplace)
                 .where(builder)
                 .fetch();

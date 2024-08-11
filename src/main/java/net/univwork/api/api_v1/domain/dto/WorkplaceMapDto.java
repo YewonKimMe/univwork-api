@@ -25,6 +25,8 @@ public class WorkplaceMapDto {
 
     private String workplaceAddress;
 
+    private Long commentNum;
+
     private Double rating;
 
     private Double lat;
