@@ -31,7 +31,7 @@ public class MapInfoController {
         UnivWpEntryMapInfoDto entryUnivMapInfo = mapService.getEntryUnivMapInfo(univCode, workplaceCode, wpTypeEnum);
         return ResponseEntity
                 .ok()
-                .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS))
+                .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS))
                 .body(entryUnivMapInfo);
     }
     // 2. 근로지 코드로 호출 시, 근로지 좌표 정보
