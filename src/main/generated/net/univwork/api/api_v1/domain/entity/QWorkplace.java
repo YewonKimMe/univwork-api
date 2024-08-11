@@ -23,6 +23,10 @@ public class QWorkplace extends EntityPathBase<Workplace> {
 
     public final StringPath jobDetail = createString("jobDetail");
 
+    public final NumberPath<Double> lat = createNumber("lat", Double.class);
+
+    public final NumberPath<Double> lng = createNumber("lng", Double.class);
+
     public final StringPath note = createString("note");
 
     public final StringPath preferredDepartment = createString("preferredDepartment");
