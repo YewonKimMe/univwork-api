@@ -1,4 +1,4 @@
-<img src="src/main/resources/static/favicon.ico"> UnivWork : 국근넷 - https://univwork.net 🤗
+<img src="src/main/resources/static/favicon.svg"> UnivWork : 국근넷 - https://univwork.net 🤗
 ================
 
 국가근로장학 근로지 후기 사이트 프로젝트(2024.02.25~)
