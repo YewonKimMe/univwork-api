@@ -11,7 +11,9 @@ public enum CookieName {
 
     REPEAT_REQUEST("SPECEDCONNECTION"),
 
-    FIND_PASSWORD_EMAIL("_fa_40123f84723ci");
+    FIND_PASSWORD_EMAIL("_fa_40123f84723ci"),
+
+    INITIAL_CONNECTION_COOKIE("_target_status_connection");
 
     private final String cookieName;
 
