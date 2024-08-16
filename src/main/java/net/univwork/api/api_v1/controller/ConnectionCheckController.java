@@ -29,7 +29,7 @@ import java.sql.Timestamp;
 public class ConnectionCheckController {
 
     @GetMapping
-    public ResponseEntity<ResultAndMessage> checkInitialConnect(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    public ResponseEntity<ResultAndMessage> checkInitialConnect(HttpServletRequest request, HttpServletResponse response) {
 
         if (CookieUtils.checkCookie(request, CookieName.INITIAL_CONNECTION_COOKIE)) {
             return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "already connect"));
