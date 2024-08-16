@@ -5,7 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.thymeleaf.context.Context;
@@ -13,6 +13,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.Random;
 
 @Slf4j
@@ -56,12 +57,13 @@ public class EmailService {
             message.addRecipients(MimeMessage.RecipientType.TO, receiverEmailAddress);
             message.setSubject("[univwork 메일 인증]"); // 이메일 제목
             message.setText(setContext(verifyLink, "emailTemplate", time), StandardCharsets.UTF_8.name().toLowerCase(), "html");
-        } catch (MessagingException e) {
-            log.error("[verify email 전송 중 오류 발생]");
-            e.printStackTrace();
+
+            emailSender.send(message);
+        } catch (MessagingException | MailException e) {
+            log.error("[verify email 전송 중 오류 발생], exception={} message={}", e.getClass().getName(), e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
-        emailSender.send(message);
+        log.info("[send verify email] email={}, time={}", receiverEmailAddress, new Timestamp(System.currentTimeMillis()));
     }
 
     private String setContext(String link, String templateName, int time) {
