@@ -6,14 +6,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.entity.Authority;
+import net.univwork.api.api_v1.domain.entity.BlockedIp;
+import net.univwork.api.api_v1.domain.entity.BlockedUser;
 import net.univwork.api.api_v1.domain.entity.User;
 import net.univwork.api.api_v1.enums.CookieName;
 import net.univwork.api.api_v1.enums.Role;
 import net.univwork.api.api_v1.exception.BlockedClientException;
 import net.univwork.api.api_v1.exception.NoAuthenticationException;
+import net.univwork.api.api_v1.exception.NoCookieValueException;
 import net.univwork.api.api_v1.exception.NoRepeatException;
+import net.univwork.api.api_v1.service.BlockedService;
 import net.univwork.api.api_v1.service.UserService;
 import net.univwork.api.api_v1.tool.CookieUtils;
+import net.univwork.api.api_v1.tool.IpTool;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -23,7 +28,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +43,8 @@ public class UserCheckAop {
     private final HttpServletResponse response;
 
     private final UserService userService;
+
+    private final BlockedService blockedService;
 
     /**
      * 모든 요청에 대해 적용
@@ -64,6 +70,7 @@ public class UserCheckAop {
         String username = null;
         if (authentication != null) {
             username = authentication.getName();
+            log.debug("username={}", username);
         } else {
             log.debug("AOP 인증 정보 미존재");
             throw new NoAuthenticationException("인증 정보가 없습니다.");
@@ -73,10 +80,11 @@ public class UserCheckAop {
         if (CookieUtils.checkCookie(request, CookieName.REPEAT_REQUEST)) {
             throw new NoRepeatException("짧은 시간 내에 반복하여 요청 할 수 없습니다.\n잠시 후 다시 시도해 주세요.");
         }
-
-
         // 유저 검증 로직
-        //String userNameUuidCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
+        String userNameUuidCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
+        if (userNameUuidCookie == null) {
+            throw new NoCookieValueException("인증 정보가 없습니다.");
+        }
         log.debug("isAnonymousUser?={}", authentication instanceof AnonymousAuthenticationToken);
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             User findUser = userService.findUserByUserId(username);
@@ -98,15 +106,25 @@ public class UserCheckAop {
                     throw new BlockedClientException("차단된 계정입니다.");
                 }
             }
+        } else {
+            BlockedUser blockedUser = blockedService.findBlockedUser(userNameUuidCookie);
+            log.debug("blockedUser={}", blockedUser.getBlockedUser());
+            if (blockedUser != null && blockedUser.getBlockedUser().equals(userNameUuidCookie)) {
+                log.error("차단된 익명 유저 감지 = {}", userNameUuidCookie);
+                throw new BlockedClientException("차단된 유저 입니다.");
+            }
         }
 
         // IP 주소 검증 로직
-//        String userIpAddr = IpTool.getIpAddr(request);
-//        BlockedIp blockedIp = blockedService.findBlockedIp(userIpAddr);
-//        if (blockedIp != null && blockedIp.getBlockedIp().equals(userIpAddr)) {
-//            setBlockCookie(response); // 사전 차단용 쿠키를 세팅
-//            throw new BlockedClientException("blocked user ip");
-//        }
+        String userIpAddr = IpTool.getIpAddr(request);
+        if (userIpAddr.contains(",")) {
+            userIpAddr = userIpAddr.split(",")[0];
+        }
+        BlockedIp blockedIp = blockedService.findBlockedIp(userIpAddr);
+        if (blockedIp != null && blockedIp.getBlockedIp().equals(userIpAddr)) {
+            setBlockCookie(response); // 사전 차단용 쿠키를 세팅
+            throw new BlockedClientException("접근 금지된 IP 입니다.");
+        }
 
         // 반복 등록 방지용 쿠키 생성
         setRepeatCookie(response);
