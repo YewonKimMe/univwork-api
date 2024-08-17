@@ -87,7 +87,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").hasRole(Role.ADMIN.getRole())
                         .requestMatchers("/api/v1/login/**").permitAll()
                         .requestMatchers("/api/v1/sign-up/**").permitAll()
-                        .requestMatchers("/api/**", "/**").permitAll())
+                        .requestMatchers("/api/v1/**", "/**").permitAll())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
