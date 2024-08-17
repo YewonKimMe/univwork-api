@@ -40,6 +40,9 @@ public class ConnectionCheckController {
 
         response.addCookie(initialConnetCheckCookie);
         String ipAddr = IpTool.getIpAddr(request);
+        if (ipAddr.contains(",")) {
+            ipAddr = ipAddr.split(",")[0];
+        }
 
         log.info("[유저 최초 접속] IP-Address={}, Time={}", ipAddr, new Timestamp(System.currentTimeMillis()));
         return ResponseEntity
