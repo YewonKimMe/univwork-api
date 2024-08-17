@@ -4,6 +4,10 @@ import java.util.regex.Pattern;
 
 public class RegexCheckTool {
 
+    private static Pattern getPattern(String regex) {
+        return Pattern.compile(regex);
+    }
+
     public static boolean emailPatternCheck(String input) {
         // 이메일 패턴 정의
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" +
@@ -24,6 +28,13 @@ public class RegexCheckTool {
     public static boolean commentCookiePatternCheck(String input) {
         String regex = "^(\\d+:\\d+;)*$";
         Pattern pattern = Pattern.compile(regex);
+
+        return pattern.matcher(input).matches();
+    }
+
+    public static boolean isValidUUIDStrings(String input) {
+        String regex = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
+        Pattern pattern = getPattern(regex);
 
         return pattern.matcher(input).matches();
     }
