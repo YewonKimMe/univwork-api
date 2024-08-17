@@ -133,7 +133,7 @@ public class AdminController {
                                                       @RequestParam(name = "commentId") String commentId,
                                                       @RequestParam(name = "reason") String reason,
                                                       @Parameter(name = "role", description = "유저 차단 시 작성자, 신고자 구별용") @RequestParam(name = "role") String role) {
-        adminService.blockUser(userId, commentId, BlockRole.fromValue(role));
+        adminService.blockUser(userId, commentId, BlockRole.fromValue(role), reason);
         log.debug("reason={}", reason);
         String target = role.equals("writer") ? "작성자" : "신고자";
         return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), target + " 차단 완료"));
