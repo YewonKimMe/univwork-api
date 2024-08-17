@@ -71,7 +71,7 @@ public class UnivRepositoryImpl implements UnivRepository {
         }
 
         // 근로지 갯수가 0개보다 많은 경우에만 가져옴
-        builder.and(university.workplaceNum.gt(1));
+        builder.and(university.workplaceNum.gt(0));
 
         // 정렬 옵션 지정
         if (sortOption == SortOption.UNIV_NAME_ASC) {
