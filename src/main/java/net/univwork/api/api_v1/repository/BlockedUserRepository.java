@@ -18,4 +18,8 @@ public interface BlockedUserRepository {
      * @since 1.0.0
      * */
     void release(String uuid);
+
+    void blockAnonymousUser(BlockedUser anonymousBlockedUser);
+
+    void blockUser(BlockedUser user);
 }

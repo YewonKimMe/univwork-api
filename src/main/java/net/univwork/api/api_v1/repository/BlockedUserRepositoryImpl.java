@@ -34,4 +34,14 @@ public class BlockedUserRepositoryImpl implements BlockedUserRepository {
     public void release(String uuid) {
         jpaBlockedUserRepository.releaseBlockedUser(uuid);
     }
+
+    @Override
+    public void blockAnonymousUser(BlockedUser anonymousBlockedUser) {
+        jpaBlockedUserRepository.save(anonymousBlockedUser);
+    }
+
+    @Override
+    public void blockUser(BlockedUser blockedUser) {
+        jpaBlockedUserRepository.save(blockedUser);
+    }
 }
