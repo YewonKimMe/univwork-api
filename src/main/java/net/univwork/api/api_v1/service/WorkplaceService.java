@@ -116,6 +116,7 @@ public class WorkplaceService {
 
         String commentCheckCookieBas64 = CookieUtils.getUserCookie(request, CookieName.WORKPLACE_COMMENT_COOKIE);
 
+        String userCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
         String decodedCommentCheckCookie = null;
 
         String responseCommentCookie = null;
@@ -204,8 +205,7 @@ public class WorkplaceService {
                 .univName(findWorkplace.getUnivName())
                 .commentUuid(commentUuidByte)
                 .comment(xssGuard.process(commentFormDto.getComment()))
-                // TODO 유저이름 세팅-uuid로 바꾸기? 프론트에서 uuid 세팅해줘야 할듯
-                .userId(isAuthenticated ? authentication.getName() : userIpAddr)
+                .userId(isAuthenticated ? authentication.getName() : userCookie)
                 .timestamp(new Timestamp(System.currentTimeMillis()))
                 .deleteFlag(false)
                 .reportFlag(false)
