@@ -14,6 +14,7 @@ import net.univwork.api.api_v1.repository.ReportedCommentRepository;
 import net.univwork.api.api_v1.repository.UserRepository;
 import net.univwork.api.api_v1.repository.jpa.JpaUserRepository;
 import net.univwork.api.api_v1.repository.jpa.JpaWorkplaceRepository;
+import net.univwork.api.api_v1.tool.RegexCheckTool;
 import net.univwork.api.api_v1.tool.UUIDConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -55,6 +55,8 @@ public class AdminService {
     private final EmailService emailService;
 
     private final RedisService redisService;
+
+    private final BlockedService blockedService;
 
     // 공지사항 리스트 획득 메소드
     public Page<Notice> getNoticeList(final int pageNumber, final int pageLimit) {
@@ -118,13 +120,18 @@ public class AdminService {
         log.info("[신고된 댓글 삭제] 댓글 uuid: {}", UUIDConverter.convertBinary16ToUUID(uuidBytes).toString());
     }
 
-    public void blockUser(String userId, String commentUuidString, BlockRole blockRole) {
+    public void blockUser(String userId, String commentUuidString, BlockRole blockRole, String reason) {
 
         byte[] uuidBytes = UUIDConverter.convertUuidStringToBinary16(commentUuidString);
 
-        adminRepository.blockUser(userId);
+        if (RegexCheckTool.isValidUUIDStrings(userId)) { // 익명 유저일 경우
+            blockedService.blockAnonymousUser(userId, reason);
+        } else {
+            adminRepository.blockUser(userId); // 유저 flag update
+            blockedService.blockUser(userId, reason); // 차단 테이블에 등록
+        }
 
-        if (blockRole == BlockRole.WRITER) {
+        if (blockRole == BlockRole.WRITER) { // 댓글 작성자 차단 시 자동으로 댓글도 숨김 처리
             log.info("[댓글 작성자 차단] userId: {}", userId);
             Optional<WorkplaceComment> commentOpt = commentRepository.findWorkplaceCommentByCommentUuid(uuidBytes);
 
