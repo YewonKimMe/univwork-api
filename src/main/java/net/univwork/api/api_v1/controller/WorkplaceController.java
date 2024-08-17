@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.CommentDto;
@@ -15,10 +16,9 @@ import net.univwork.api.api_v1.domain.dto.WorkplaceDetailDto;
 import net.univwork.api.api_v1.domain.dto.WorkplaceRatingDto;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.enums.CookieName;
-import net.univwork.api.api_v1.exception.DuplicationException;
-import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.service.WorkplaceService;
 import net.univwork.api.api_v1.tool.IpTool;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -44,6 +44,9 @@ public class WorkplaceController {
 
     private final WorkplaceService service;
 
+    @Value("${comment.isAllowAnonymousUsers:true}")
+    private boolean isAllowAnonymousUsers;
+
     /**
      * getWorkplaceDetail: 근로지 정보와 근로지 댓글을 가져옴
      * @param univCode 학교 코드
@@ -51,7 +54,7 @@ public class WorkplaceController {
      * @param pageNumber 페이지 번호
      * @param pageLimit 페이지 당 요소 수
      * @see net.univwork.api.api_v1.service.WorkplaceService#getWorkplace(Long, Long)
-     * @see net.univwork.api.api_v1.service.WorkplaceService#getWorkplaceComments(Long, Long, int, int, Authentication) 
+     * @see net.univwork.api.api_v1.service.WorkplaceService#getWorkplaceComments(Long, Long, int, int, Authentication, boolean)
      * @see net.univwork.api.api_v1.domain.dto.WorkplaceDetailDto
      * WorkplaceDetailDto: 응답 리턴 복합 객체(workplace, commentPage)
      * @since 1.0.0
@@ -80,7 +83,7 @@ public class WorkplaceController {
         Workplace workplace = service.getWorkplace(univCode, workplaceCode);
 
         // 근로지 댓글 페이지 획득
-        Page<CommentDto> workplaceComments = service.getWorkplaceComments(univCode, workplaceCode, pageNumber, pageLimit, authentication);
+        Page<CommentDto> workplaceComments = service.getWorkplaceComments(univCode, workplaceCode, pageNumber, pageLimit, authentication, isAllowAnonymousUsers);
 
         // 근로지 rating 획득
         WorkplaceRatingDto workplaceRatingDto = service.calculateRatingResult(univCode, workplaceCode);
@@ -102,7 +105,7 @@ public class WorkplaceController {
      * @param workplaceCode 근로지 코드
      * @see IpTool#getIpAddr()
      * @see net.univwork.api.api_v1.tool.CookieUtils#getUserCookie(HttpServletRequest, CookieName)
-     * @see net.univwork.api.api_v1.service.WorkplaceService#saveWorkplaceComment(CommentFormDto, Long, Long, String, Authentication) 
+     * @see net.univwork.api.api_v1.service.WorkplaceService#saveWorkplaceComment(CommentFormDto, Long, Long, Authentication, boolean, HttpServletRequest, HttpServletResponse)
      * @since 1.0.0
      * @return CommentDto
      * */
@@ -118,15 +121,9 @@ public class WorkplaceController {
             @PathVariable(name = "univ-code") final Long univCode,
             @PathVariable(name = "workplace-code") final Long workplaceCode,
             HttpServletRequest request,
+            HttpServletResponse response,
             Authentication authentication) {
 
-        if (null == authentication) { // 인증 정보가 없을 경우 댓글 작성 불가능
-            throw new NoAuthenticationException("로그인 정보가 없습니다.");
-        }
-
-        if (service.countUserComments(authentication, univCode, workplaceCode) > 0) { // 같은 근로지 중복 작성 방지
-            throw new DuplicationException("이미 같은 근로지에 작성한 댓글이 존재합니다.\n근로지 당 하나의 댓글만 작성할 수 있습니다.");
-        }
 
         if (bindingResult.hasErrors()) { // binding 결과에 오류가 있을 경우
             StringBuilder errorMessage = new StringBuilder(); // 오류 메세지 StringBuilder 생성
@@ -145,12 +142,10 @@ public class WorkplaceController {
         }
 
         // ---------- 정상 처리 로직 ------------
-        String ipAddr = IpTool.getIpAddr(request); // 작성자 IP 획득
 
-        CommentDto commentDto = service.saveWorkplaceComment(comment, univCode, workplaceCode, ipAddr, authentication); // 댓글 저장 후, 리턴하기 위해 CommentDto 형식으로 반환
+        CommentDto commentDto = service.saveWorkplaceComment(comment, univCode, workplaceCode, authentication, isAllowAnonymousUsers, request, response); // 댓글 저장 후, 리턴하기 위해 CommentDto 형식으로 반환
 
         log.debug("Saved And return CommentDto={}", commentDto);
-        log.info("Saved WorkplaceComment: user={}, IP address={}", authentication.getName(), ipAddr);
 
         return ResponseEntity.ok(commentDto);
     }
