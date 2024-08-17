@@ -34,4 +34,9 @@ public class BlockedIpRepositoryImpl implements BlockedIpRepository {
     public void release(String blockedIp) {
         jpaBlockedIpRepository.releaseBlockedIp(blockedIp);
     }
+
+    @Override
+    public void block(BlockedIp blockedIp) {
+        jpaBlockedIpRepository.save(blockedIp);
+    }
 }

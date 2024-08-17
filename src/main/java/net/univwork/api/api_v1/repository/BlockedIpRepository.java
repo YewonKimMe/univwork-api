@@ -19,4 +19,6 @@ public interface BlockedIpRepository {
      * @since 1.0.0
      * */
     void release(String blockedIp);
+
+    void block(BlockedIp blockedIp);
 }
