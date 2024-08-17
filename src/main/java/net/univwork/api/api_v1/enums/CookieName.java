@@ -13,7 +13,9 @@ public enum CookieName {
 
     FIND_PASSWORD_EMAIL("_fa_40123f84723ci"),
 
-    INITIAL_CONNECTION_COOKIE("_target_status_connection");
+    INITIAL_CONNECTION_COOKIE("_target_status_connection"),
+
+    WORKPLACE_COMMENT_COOKIE("_service_maintain_operation_value");
 
     private final String cookieName;
 
