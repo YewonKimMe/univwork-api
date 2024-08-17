@@ -36,4 +36,28 @@ public class UuidAndIpBlockServiceImpl implements BlockedService {
     public void releaseIp(String blockedIp) {
         ipRepository.release(blockedIp);
     }
+
+    @Override
+    public void blockAnonymousUser(String userId, String reason) {
+        BlockedUser blockedUser = new BlockedUser();
+        blockedUser.setBlockedUser(userId);
+        blockedUser.setReason(reason);
+        userRepository.blockAnonymousUser(blockedUser);
+    }
+
+    @Override
+    public void blockUser(String userId, String reason) {
+        BlockedUser blockedUser = new BlockedUser();
+        blockedUser.setBlockedUser(userId);
+        blockedUser.setReason(reason);
+        userRepository.blockUser(blockedUser);
+    }
+
+    @Override
+    public void blockIp(String userIp, String reason) {
+        BlockedIp blockedIp = new BlockedIp();
+        blockedIp.setBlockedIp(userIp);
+        blockedIp.setReason(reason);
+        ipRepository.block(blockedIp);
+    }
 }

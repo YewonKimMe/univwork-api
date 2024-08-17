@@ -36,4 +36,10 @@ public interface BlockedService {
      * @since 1.0.0
      * */
     void releaseIp(String blockedIp);
+
+    void blockAnonymousUser(String userId, String reason);
+
+    void blockUser(String userId, String reason);
+
+    void blockIp(String userIp, String reason);
 }
