@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.CommentReportDto;
 import net.univwork.api.api_v1.domain.entity.ReportedComment;
 import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
+import net.univwork.api.api_v1.enums.CookieName;
 import net.univwork.api.api_v1.enums.ReportReason;
 import net.univwork.api.api_v1.exception.AlreadyReportedException;
 import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.repository.CommentRepository;
 import net.univwork.api.api_v1.repository.ReportedCommentRepository;
+import net.univwork.api.api_v1.tool.CookieUtils;
 import net.univwork.api.api_v1.tool.IpTool;
 import net.univwork.api.api_v1.tool.UUIDConverter;
 import org.springframework.security.core.Authentication;
@@ -33,13 +35,21 @@ public class CommentService {
     public void reportComment(CommentReportDto reportDto, HttpServletRequest request, Authentication authentication) {
 
         String reportUserIp = IpTool.getIpAddr(request); // 신고 유저 IP
+        if (reportUserIp.contains(",")) {
+            reportUserIp = reportUserIp.split(",")[0];
+        }
         String reportUserId = null;
+
+        String userCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
 
         if (null != authentication) { // 로그인된 회원일 경우, ID 획득
             reportUserId = authentication.getName();
         } else { // 비회원인 경우,
-            log.error("신고 권한이 존재하지 않습니다");
-            throw new NoAuthenticationException("로그인 이후 신고할 수 있습니다.");
+            reportUserId = userCookie;
+            if (reportUserId == null) {
+                log.error("신고 권한이 존재하지 않습니다");
+                throw new NoAuthenticationException("인증 정보가 없어 신고할 수 없습니다.");
+            }
         }
 
         ReportReason reportReason = ReportReason.fromValue(reportDto.getReason()); // 신고 사유 적합성 검증
