@@ -26,12 +26,13 @@ public class UserCheckInterceptor implements HandlerInterceptor {
      * */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.debug("userCookieValue={}", CookieUtils.getUserCookie(request, CookieName.USER_COOKIE));
         if (!CookieUtils.checkCookie(request, CookieName.USER_COOKIE)) {
-            Cookie cookie = new Cookie(ConstString.USER_COOKIE, UUID.randomUUID().toString());
+            Cookie cookie = new Cookie(CookieName.USER_COOKIE.getCookieName(), UUID.randomUUID().toString());
             cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(30)); // 쿠키 유효기간은 30일
             cookie.setPath("/"); // / 경로 이하에 모두 적용
             response.addCookie(cookie);
-            log.info("[신규 유저 확인: 유저명={}, 시간={}]", cookie.getValue(), new Timestamp(System.currentTimeMillis()));
+            log.info("[신규 유저 확인: 유저명={}]", cookie.getValue());
         }
 
         return true;
