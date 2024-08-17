@@ -20,10 +20,7 @@ import net.univwork.api.api_v1.exception.DuplicationException;
 import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.exception.NoCookieValueException;
 import net.univwork.api.api_v1.repository.WorkplaceRepository;
-import net.univwork.api.api_v1.tool.CookieUtils;
-import net.univwork.api.api_v1.tool.IpTool;
-import net.univwork.api.api_v1.tool.UUIDConverter;
-import net.univwork.api.api_v1.tool.UserInputXSSGuard;
+import net.univwork.api.api_v1.tool.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -115,7 +112,7 @@ public class WorkplaceService {
      * @return CommentDto 페이지 객체
      * @see net.univwork.api.api_v1.repository.WorkplaceRepository#saveWorkplaceComment(WorkplaceComment) 
      * */
-    public CommentDto saveWorkplaceComment(CommentFormDto commentFormDto, final Long univCode, final Long workplaceCode, final String userIp, final Authentication authentication, boolean isAllowAnonymousUsers, HttpServletRequest request, HttpServletResponse response) {
+    public CommentDto saveWorkplaceComment(CommentFormDto commentFormDto, final Long univCode, final Long workplaceCode, final Authentication authentication, boolean isAllowAnonymousUsers, HttpServletRequest request, HttpServletResponse response) {
 
         String commentCheckCookieBas64 = CookieUtils.getUserCookie(request, CookieName.WORKPLACE_COMMENT_COOKIE);
 
@@ -127,9 +124,9 @@ public class WorkplaceService {
 
         boolean isAuthenticated = authentication != null;
 
-        String ipAddr = IpTool.getIpAddr(request);
-        if (ipAddr.contains(",")) {
-            ipAddr = ipAddr.split(",")[0];
+        String userIpAddr = IpTool.getIpAddr(request);
+        if (userIpAddr.contains(",")) {
+            userIpAddr = userIpAddr.split(",")[0];
         }
 
         // 익명유저 댓글 등록이 허용되지 않는 경우
@@ -157,30 +154,38 @@ public class WorkplaceService {
         // 익명 유저 댓글 등록 허용, 로그인 유저도 확인
         // commentCheckCookie 가 null 인 경우, 오류
         if (commentCheckCookieBas64 == null) {
-            log.error("[댓글 등록 쿠키값 위변조:제거됨] ip={}", ipAddr);
+            log.error("[댓글 등록 쿠키값 위변조:제거됨] ip={}", userIpAddr);
             throw new NoCookieValueException("잘못된 요청입니다.");
         }
 
         // commentCheckCookie 가 빈 문자열이 아닌 경우, 익명 유저 중복 방지 댓글 확인 시작
         // 댓글 등록 확인자는 대학코드:근로지코드;대학코드:근로지코드; 로 구성되어 있음
-        if (!commentCheckCookieBas64.isEmpty() && !isAuthenticated) {
+        if (!commentCheckCookieBas64.isEmpty() || !isAuthenticated) {
             byte[] decodedCommentCheckCookieBytes = Base64.getDecoder().decode(commentCheckCookieBas64);
             decodedCommentCheckCookie = new String(decodedCommentCheckCookieBytes);
+
+            log.debug("decodedCommentCheckCookie={}", decodedCommentCheckCookie);
+            if (!RegexCheckTool.commentCookiePatternCheck(decodedCommentCheckCookie)) {
+                log.error("[댓글 등록 쿠키값 위변조:변조됨] ip={}", userIpAddr);
+                throw new RuntimeException("쿠키값 위변조 오류 발생");
+            }
+
             // 응답값 StringBuilder 에 기존 쿠키값 세팅
             beforeEncodedSb.append(decodedCommentCheckCookie);
+            if (decodedCommentCheckCookie.contains(";")) {
+                String[] cookieArray = decodedCommentCheckCookie.split(";");
 
-            String[] cookieArray = decodedCommentCheckCookie.split(";");
-            Arrays.stream(cookieArray).forEach(
-                    cookieValue -> {
-                        Long cookieUnivCode = Long.valueOf(cookieValue.split(":")[0]);
-                        Long cookieWorkplaceCode = Long.valueOf(cookieValue.split(":")[1]);
-                        if (univCode.equals(cookieUnivCode) && workplaceCode.equals(cookieWorkplaceCode)) {
-                            throw new DuplicationException("이미 댓글을 작성한 근로지 입니다.");
-                        }
+                for (String cookieValue : cookieArray) {
+                    if (cookieValue.isEmpty()) {
+                        continue;
                     }
-            );
-            // TODO checkCommentCookie Setting
-            beforeEncodedSb.append(univCode).append(":").append(workplaceCode).append(";");
+                    Long cookieUnivCode = Long.valueOf(cookieValue.split(":")[0]);
+                    Long cookieWorkplaceCode = Long.valueOf(cookieValue.split(":")[1]);
+                    if (univCode.equals(cookieUnivCode) && workplaceCode.equals(cookieWorkplaceCode)) {
+                        throw new DuplicationException("이미 같은 근로지에 작성한 댓글이 존재합니다.\n근로지 당 하나의 댓글만 작성할 수 있습니다.");
+                    }
+                }
+            }
         }
 
 
@@ -200,11 +205,11 @@ public class WorkplaceService {
                 .commentUuid(commentUuidByte)
                 .comment(xssGuard.process(commentFormDto.getComment()))
                 // TODO 유저이름 세팅-uuid로 바꾸기? 프론트에서 uuid 세팅해줘야 할듯
-                .userId(isAuthenticated ? authentication.getName() : userIp)
+                .userId(isAuthenticated ? authentication.getName() : userIpAddr)
                 .timestamp(new Timestamp(System.currentTimeMillis()))
                 .deleteFlag(false)
                 .reportFlag(false)
-                .userIp(userIp)
+                .userIp(userIpAddr)
                 .rating(commentFormDto.getRating())
                 .build();
 
@@ -218,15 +223,17 @@ public class WorkplaceService {
         // workplace rating update
         this.updateWorkplaceRating(univCode, workplaceCode, findWorkplace);
 
-        if (!beforeEncodedSb.toString().isEmpty()) {
-            byte[] afterCookieByte = beforeEncodedSb.toString().getBytes();
-            responseCommentCookie = Base64.getEncoder().encodeToString(afterCookieByte);
+        // 댓글 등록 완료 후 univCode, workplaceCode 을 cookie 에 세팅 절차
+        beforeEncodedSb.append(univCode).append(":").append(workplaceCode).append(";");
 
-            Cookie cookie = new Cookie(CookieName.WORKPLACE_COMMENT_COOKIE.getCookieName(), responseCommentCookie);
-            cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(30));
-            cookie.setPath("/");
-            response.addCookie(cookie);
-        }
+        byte[] afterCookieByte = beforeEncodedSb.toString().getBytes();
+        responseCommentCookie = Base64.getEncoder().encodeToString(afterCookieByte);
+        log.debug("responseCommentCookie={}", responseCommentCookie);
+        Cookie cookie = new Cookie(CookieName.WORKPLACE_COMMENT_COOKIE.getCookieName(), responseCommentCookie);
+        cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(180));
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
         // CommentDto로 변환해서 반환
         return new CommentDto(comment); // 나중에 MapStruct 쓰자
     }
