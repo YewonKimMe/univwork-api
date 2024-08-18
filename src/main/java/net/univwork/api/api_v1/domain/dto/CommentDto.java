@@ -39,6 +39,19 @@ public class CommentDto {
         this.comment = comment;
     }
 
+    public CommentDto(Long commentCode, Long univCode, Long workplaceCode, String workplaceName, String univName, byte[] commentUuid, String comment, int upvote, Timestamp timestamp, Double rating) {
+        this.commentCode = commentCode;
+        this.univCode = univCode;
+        this.workplaceCode = workplaceCode;
+        this.workplaceName = workplaceName;
+        this.univName = univName;
+        this.commentUuid = UUIDConverter.convertBinary16ToUUID(commentUuid).toString();
+        this.comment = comment;
+        this.upvote = upvote;
+        this.timestamp = timestamp;
+        this.rating = rating;
+    }
+
     public CommentDto(WorkplaceComment workplaceComment) {
         this.commentCode = workplaceComment.getCommentCode();
         this.univCode = workplaceComment.getUnivCode();
