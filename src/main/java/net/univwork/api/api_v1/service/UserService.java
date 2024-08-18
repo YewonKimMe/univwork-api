@@ -2,12 +2,17 @@ package net.univwork.api.api_v1.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.univwork.api.api_v1.domain.dto.CommentDto;
 import net.univwork.api.api_v1.domain.dto.UserDetailDto;
 import net.univwork.api.api_v1.domain.entity.User;
 import net.univwork.api.api_v1.enums.UnivEmailDomain;
 import net.univwork.api.api_v1.exception.PasswordNotMatchException;
 import net.univwork.api.api_v1.exception.UserNotExistException;
 import net.univwork.api.api_v1.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,6 +103,11 @@ public class UserService {
             return userRepository.withdraw(userId);
         }
         throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+    }
+
+    public Page<CommentDto> getCommentsPerUser(final int pageNumber, final int pageLimit, Authentication authentication) {
+        Pageable pageable = PageRequest.of(pageNumber, pageLimit);
+        return userRepository.getCommentsPerUser(pageable, authentication.getName());
     }
 
 }
