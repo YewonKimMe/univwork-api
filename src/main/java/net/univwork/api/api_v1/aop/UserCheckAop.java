@@ -108,10 +108,13 @@ public class UserCheckAop {
             }
         } else {
             BlockedUser blockedUser = blockedService.findBlockedUser(userNameUuidCookie);
-            log.debug("blockedUser={}", blockedUser.getBlockedUser());
-            if (blockedUser != null && blockedUser.getBlockedUser().equals(userNameUuidCookie)) {
-                log.error("차단된 익명 유저 감지 = {}", userNameUuidCookie);
-                throw new BlockedClientException("차단된 유저 입니다.");
+
+            if (blockedUser != null) {
+                log.debug("blockedUser={}", blockedUser.getBlockedUser());
+                if (blockedUser.getBlockedUser().equals(userNameUuidCookie)) {
+                    log.error("차단된 익명 유저 감지 = {}", userNameUuidCookie);
+                    throw new BlockedClientException("잘못된 접근입니다.");
+                }
             }
         }
 
