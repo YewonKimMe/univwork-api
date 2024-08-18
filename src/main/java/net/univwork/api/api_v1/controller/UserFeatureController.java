@@ -17,6 +17,10 @@ import net.univwork.api.api_v1.exception.PasswordNotMatchException;
 import net.univwork.api.api_v1.exception.UserNotExistException;
 import net.univwork.api.api_v1.service.UserService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +29,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -48,11 +54,19 @@ public class UserFeatureController {
 
     @Operation(summary = "댓글 조회", description = "특정 회원 댓글 조회")
     @GetMapping("/my-comments")
-    public ResponseEntity<Page<CommentDto>> getUserComments(@Parameter(hidden = true) Authentication authentication) {
+    public ResponseEntity<PagedModel<EntityModel<CommentDto>>> getUserComments(
+            @RequestParam(name = "page", defaultValue = "0") final int pageNumber,
+            @RequestParam(name = "size", defaultValue = "10") final int pageLimit,
+            @Parameter(hidden = true) Authentication authentication, @Parameter(hidden = true) PagedResourcesAssembler<CommentDto> assembler) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return null;
+        Page<CommentDto> userCommentList = userService.getCommentsPerUser(pageNumber, pageLimit, authentication);
+        PagedModel<EntityModel<CommentDto>> model = assembler.toModel(userCommentList);
+        return ResponseEntity
+                .ok()
+                .cacheControl(CacheControl.maxAge(10, TimeUnit.SECONDS))
+                .body(model);
     }
 
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경")
