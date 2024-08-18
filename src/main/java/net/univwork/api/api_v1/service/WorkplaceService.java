@@ -230,7 +230,7 @@ public class WorkplaceService {
         responseCommentCookie = Base64.getEncoder().encodeToString(afterCookieByte);
         log.debug("responseCommentCookie={}", responseCommentCookie);
         Cookie cookie = new Cookie(CookieName.WORKPLACE_COMMENT_COOKIE.getCookieName(), responseCommentCookie);
-        cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(180));
+        cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(30));
         cookie.setPath("/");
         response.addCookie(cookie);
 
