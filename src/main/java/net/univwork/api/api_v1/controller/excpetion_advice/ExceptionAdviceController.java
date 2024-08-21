@@ -277,6 +277,22 @@ public class ExceptionAdviceController {
     }
 
     /**
+     * API 예외처리 ExcelFileAdditionException
+     * @param e ExcelFileAdditionException
+     * @return ErrorResultAndMessage
+     * @apiNote ExcelFileAdditionException 발생 시
+     * @see ErrorResultAndMessage
+     * */
+    @ExceptionHandler(NoCookieValueException.class)
+    public ResponseEntity<ResultAndMessage> noCookieValue(NoCookieValueException e) {
+        ErrorResultAndMessage errorResultAndMessage = new ErrorResultAndMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResultAndMessage);
+    }
+
+    /**
      * API 예외처리 핸들러_범용_RuntimeException
      * @param e RuntimeException
      * @return ErrorResultAndMessage
