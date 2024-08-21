@@ -40,7 +40,7 @@ public class ConnectionCheckController {
         initialConnetCheckCookie.setPath("/");
         initialConnetCheckCookie.setMaxAge(-1); // 브라우저 종료 시 삭제
 
-        Cookie commentCookie = new Cookie(CookieName.WORKPLACE_COMMENT_COOKIE.getCookieName(), Base64.getEncoder().encodeToString("s".getBytes()));
+        Cookie commentCookie = new Cookie(CookieName.WORKPLACE_COMMENT_COOKIE.getCookieName(), "s");
         commentCookie.setPath("/");
         commentCookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(14)); // 댓글 쿠키, 7일짜리
         response.addCookie(initialConnetCheckCookie);
