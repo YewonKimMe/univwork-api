@@ -170,7 +170,7 @@ public class WorkplaceService {
 
             log.debug("decodedCommentCheckCookie={}", decodedCommentCheckCookie);
             if (!RegexCheckTool.commentCookiePatternCheck(decodedCommentCheckCookie)) {
-                log.error("[댓글 등록 쿠키값 위변조:변조됨] ip={}", userIpAddr);
+                log.error("[댓글 등록 쿠키값 위변조:변조됨] ip={}, decodedCommentCheckCookie={}", userIpAddr, decodedCommentCheckCookie);
                 throw new RuntimeException("쿠키값 위변조 오류 발생");
             }
 
