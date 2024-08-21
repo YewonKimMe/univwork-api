@@ -115,7 +115,7 @@ public class WorkplaceService {
     public CommentDto saveWorkplaceComment(CommentFormDto commentFormDto, final Long univCode, final Long workplaceCode, final Authentication authentication, boolean isAllowAnonymousUsers, HttpServletRequest request, HttpServletResponse response) {
 
         String commentCheckCookieBas64 = CookieUtils.getUserCookie(request, CookieName.WORKPLACE_COMMENT_COOKIE);
-
+        log.debug("commentCheckCookieBas64={}", commentCheckCookieBas64);
         String userCookie = CookieUtils.getUserCookie(request, CookieName.USER_COOKIE);
         String decodedCommentCheckCookie = null;
 
@@ -154,7 +154,7 @@ public class WorkplaceService {
 
         // 익명 유저 댓글 등록 허용, 로그인 유저도 확인
         // commentCheckCookie 가 null 인 경우, 오류
-        if (commentCheckCookieBas64 == null) {
+        if (commentCheckCookieBas64 == null || !commentCheckCookieBas64.startsWith("s")) {
             log.error("[댓글 등록 쿠키값 위변조:제거됨] ip={}", userIpAddr);
             throw new NoCookieValueException("잘못된 요청입니다.");
         }
@@ -162,6 +162,9 @@ public class WorkplaceService {
         // commentCheckCookie 가 빈 문자열이 아닌 경우, 익명 유저 중복 방지 댓글 확인 시작
         // 댓글 등록 확인자는 대학코드:근로지코드;대학코드:근로지코드; 로 구성되어 있음
         if (!commentCheckCookieBas64.isEmpty() || !isAuthenticated) {
+            if (commentCheckCookieBas64.charAt(0) == 's') {
+                commentCheckCookieBas64 = commentCheckCookieBas64.substring(1);
+            }
             byte[] decodedCommentCheckCookieBytes = Base64.getDecoder().decode(commentCheckCookieBas64);
             decodedCommentCheckCookie = new String(decodedCommentCheckCookieBytes);
 
