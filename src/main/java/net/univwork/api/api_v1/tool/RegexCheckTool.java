@@ -27,6 +27,7 @@ public class RegexCheckTool {
 
     public static boolean commentCookiePatternCheck(String input) {
         String regex = "^(\\d+:\\d+;)*$";
+        //String regex = "^s(\\d+:\\d+;)+$";
         Pattern pattern = Pattern.compile(regex);
 
         return pattern.matcher(input).matches();
