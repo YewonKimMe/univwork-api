@@ -76,6 +76,7 @@ public class WorkplaceController {
             @Parameter(hidden = true) Authentication authentication,
             @Parameter(hidden = true) PagedResourcesAssembler<CommentDto> assembler) {
 
+        log.info("[근로지 댓글 조회 요청] univCode={}, workplaceCode={}, isAllowAnonymousUsers={}",univCode, workplaceCode, isAllowAnonymousUsers);
         // 근로지 조회수 1 증가
         service.updateView(univCode, workplaceCode);
 
