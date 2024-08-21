@@ -155,7 +155,7 @@ public class WorkplaceService {
         // 익명 유저 댓글 등록 허용, 로그인 유저도 확인
         // commentCheckCookie 가 null 인 경우, 오류
         if (commentCheckCookieBas64 == null || !commentCheckCookieBas64.startsWith("s")) {
-            log.error("[댓글 등록 쿠키값 위변조:제거됨] ip={}", userIpAddr);
+            log.error("[댓글 등록 쿠키값 위변조:제거됨] ip={}, commentCheckCookieBase64={}", userIpAddr, commentCheckCookieBas64);
             throw new NoCookieValueException("잘못된 요청입니다.");
         }
 
