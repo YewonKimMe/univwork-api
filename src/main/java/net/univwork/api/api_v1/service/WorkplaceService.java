@@ -230,10 +230,10 @@ public class WorkplaceService {
         beforeEncodedSb.append(univCode).append(":").append(workplaceCode).append(";");
 
         byte[] afterCookieByte = beforeEncodedSb.toString().getBytes();
-        responseCommentCookie = Base64.getEncoder().encodeToString(afterCookieByte);
+        responseCommentCookie = "s" + Base64.getEncoder().encodeToString(afterCookieByte);
         log.debug("responseCommentCookie={}", responseCommentCookie);
         Cookie cookie = new Cookie(CookieName.WORKPLACE_COMMENT_COOKIE.getCookieName(), responseCommentCookie);
-        cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(30));
+        cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(14));
         cookie.setPath("/");
         response.addCookie(cookie);
 
