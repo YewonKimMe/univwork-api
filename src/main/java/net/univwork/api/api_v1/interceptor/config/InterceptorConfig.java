@@ -12,10 +12,10 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     private final UserCheckInterceptor userCheckInterceptor;
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(userCheckInterceptor)
-                .addPathPatterns("/api/v1/**")
-                .order(1);
-    }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(userCheckInterceptor)
+//                .addPathPatterns("/api/v1/**")
+//                .order(1);
+//    }
 }

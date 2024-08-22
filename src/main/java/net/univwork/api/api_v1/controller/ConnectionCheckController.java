@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
 import java.util.Base64;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -36,16 +37,13 @@ public class ConnectionCheckController {
         if (CookieUtils.checkCookie(request, CookieName.INITIAL_CONNECTION_COOKIE)) {
             return ResponseEntity.ok().body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "already connect"));
         }
-        Cookie initialConnetCheckCookie = new Cookie(CookieName.INITIAL_CONNECTION_COOKIE.getCookieName(), "1");
-        initialConnetCheckCookie.setPath("/");
-        initialConnetCheckCookie.setMaxAge(-1); // 브라우저 종료 시 삭제
 
-        Cookie commentCookie = new Cookie(CookieName.WORKPLACE_COMMENT_COOKIE.getCookieName(), "s");
-        commentCookie.setPath("/");
-        commentCookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(14)); // 댓글 쿠키, 7일짜리
+        checkAndSetUserCookie(request, response);
 
-        response.addCookie(initialConnetCheckCookie);
-        response.addCookie(commentCookie);
+        setInitialConnectCookie(response);
+
+        setCommentCountingCookie(response);
+
         String ipAddr = IpTool.getIpAddr(request);
         if (ipAddr.contains(",")) {
             ipAddr = ipAddr.split(",")[0];
@@ -55,5 +53,31 @@ public class ConnectionCheckController {
         return ResponseEntity
                 .ok()
                 .body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "initial connect"));
+    }
+
+    private void checkAndSetUserCookie(HttpServletRequest request, HttpServletResponse response) {
+        if (!CookieUtils.checkCookie(request, CookieName.USER_COOKIE)) {
+            Cookie cookie = new Cookie(CookieName.USER_COOKIE.getCookieName(), UUID.randomUUID().toString());
+            cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(30)); // 쿠키 유효기간은 30일
+            cookie.setPath("/"); // / 경로 이하에 모두 적용
+            response.addCookie(cookie);
+            log.info("[Connection Controller - 신규 익명 유저: 유저명={}]", cookie.getValue());
+        }
+
+    }
+
+    private void setInitialConnectCookie(HttpServletResponse response) {
+        Cookie initialConnetCheckCookie = new Cookie(CookieName.INITIAL_CONNECTION_COOKIE.getCookieName(), "1");
+        initialConnetCheckCookie.setPath("/");
+        initialConnetCheckCookie.setMaxAge(-1); // 브라우저 종료 시 삭제
+        response.addCookie(initialConnetCheckCookie);
+    }
+
+    private void setCommentCountingCookie(HttpServletResponse response) {
+        Cookie commentCookie = new Cookie(CookieName.WORKPLACE_COMMENT_COOKIE.getCookieName(), "s");
+        commentCookie.setPath("/");
+        commentCookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(14)); // 댓글 쿠키, 7일짜리
+
+        response.addCookie(commentCookie);
     }
 }
