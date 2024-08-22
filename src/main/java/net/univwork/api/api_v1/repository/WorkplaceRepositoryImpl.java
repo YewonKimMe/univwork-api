@@ -2,10 +2,12 @@ package net.univwork.api.api_v1.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
+import net.univwork.api.api_v1.domain.dto.Preview;
 import net.univwork.api.api_v1.domain.entity.QWorkplaceComment;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
@@ -146,5 +148,21 @@ public class WorkplaceRepositoryImpl implements WorkplaceRepository{
                 .from(workplaceComment)
                 .where(builder)
                 .fetchOne();
+    }
+
+    @Override
+    public List<Preview> getPreview(Long previewCnt) {
+
+        QWorkplaceComment workplaceComment = QWorkplaceComment.workplaceComment;
+        OrderSpecifier<?> orderSpecifier = null; // 정렬
+
+        orderSpecifier = workplaceComment.timestamp.desc();
+
+        return queryFactory
+                .select(Projections.constructor(Preview.class, workplaceComment.univName, workplaceComment.workplaceName, workplaceComment.comment, workplaceComment.univCode, workplaceComment.workplaceCode, workplaceComment.rating))
+                .from(workplaceComment)
+                .orderBy(orderSpecifier)
+                .limit(previewCnt)
+                .fetch();
     }
 }

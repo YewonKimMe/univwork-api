@@ -1,9 +1,12 @@
 package net.univwork.api.api_v1.repository;
 
+import net.univwork.api.api_v1.domain.dto.Preview;
 import net.univwork.api.api_v1.domain.entity.Workplace;
 import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface WorkplaceRepository {
 
@@ -47,5 +50,5 @@ public interface WorkplaceRepository {
 
     Double sumCommentRating(Long univCode, Long workplaceCode);
 
-
+    List<Preview> getPreview(Long previewCnt);
 }
