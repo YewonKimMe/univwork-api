@@ -78,7 +78,7 @@ public class WorkplaceService {
 
         Page<WorkplaceComment> workplaceComments = repository.getWorkplaceComments(pageable, univCode, workplaceCode); // WorkplaceComment 페이지를 가져옴
 
-        log.info("[근로지 댓글 조회 요청] isAllowAnonymousUsers={}", isAllowAnonymousUsers);
+        //log.info("[근로지 댓글 조회 요청] isAllowAnonymousUsers={}", isAllowAnonymousUsers);
         List<CommentDto> commentDtoList = workplaceComments.getContent().stream()
                 .map(comment -> {
                     CommentDto dto = new CommentDto(comment);
