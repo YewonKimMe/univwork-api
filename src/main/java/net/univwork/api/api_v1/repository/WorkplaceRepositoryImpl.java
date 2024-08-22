@@ -123,6 +123,7 @@ public class WorkplaceRepositoryImpl implements WorkplaceRepository{
         BooleanBuilder builder = new BooleanBuilder(); // 조건
 
         builder.and(workplaceComment.rating.isNotNull());
+        builder.and(workplaceComment.deleteFlag.isFalse());
         builder.and(workplaceComment.univCode.eq(univCode));
         builder.and(workplaceComment.workplaceCode.eq(workplaceCode));
         Long cnt = queryFactory
@@ -154,10 +155,11 @@ public class WorkplaceRepositoryImpl implements WorkplaceRepository{
     public List<Preview> getPreview(Long previewCnt) {
 
         QWorkplaceComment workplaceComment = QWorkplaceComment.workplaceComment;
+        BooleanBuilder builder = new BooleanBuilder(); // 조건
         OrderSpecifier<?> orderSpecifier = null; // 정렬
 
         orderSpecifier = workplaceComment.timestamp.desc();
-
+        builder.and(workplaceComment.deleteFlag.isFalse());
         return queryFactory
                 .select(Projections.constructor(Preview.class, workplaceComment.univName, workplaceComment.workplaceName, workplaceComment.comment, workplaceComment.univCode, workplaceComment.workplaceCode, workplaceComment.rating))
                 .from(workplaceComment)
