@@ -95,9 +95,9 @@ public class CommentService {
         if (ipAddr.contains(",")) {
             ipAddr = ipAddr.split(",")[0];
         }
-        log.info("[좋아요 요청], 댓글 코드: {}, ip: {}", commentCode, ipAddr);
         // 중복 좋아요 감지 로직 - ip
         if (commentRepository.checkDuplicatedLikeToIp(commentCode, ipAddr)) {
+            log.info("[좋아요 중복 요청] commentCode: {}, ip: {}", commentCode, ipAddr);
             throw new DuplicationException("이미 좋아요를 누르셨습니다.");
         }
         // 좋아요 업데이트
