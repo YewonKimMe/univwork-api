@@ -95,7 +95,7 @@ public class WorkplaceController {
         WorkplaceDetailDto workplaceDetailDto = new WorkplaceDetailDto(workplace, workplaceRatingDto, model);
 
         return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(4, TimeUnit.SECONDS))
+                .cacheControl(CacheControl.maxAge(2, TimeUnit.SECONDS))
                 .body(workplaceDetailDto);
     }
 
