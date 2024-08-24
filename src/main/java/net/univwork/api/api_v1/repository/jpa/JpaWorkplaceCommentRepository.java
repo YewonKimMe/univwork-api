@@ -34,4 +34,8 @@ public interface JpaWorkplaceCommentRepository extends JpaRepository<WorkplaceCo
     @Modifying
     @Query("UPDATE WorkplaceComment wc SET wc.deleteFlag = true where wc.commentUuid = :commentUuid")
     void deleteWorkplaceComment(@Param("commentUuid") byte[] uuid);
+
+    @Modifying
+    @Query("UPDATE WorkplaceComment wc SET wc.upvote = wc.upvote + 1 where wc.commentCode = :commentCode")
+    void updateCommentLike(@Param("commentCode") Long commentCode);
 }
