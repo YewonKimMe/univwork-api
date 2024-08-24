@@ -161,7 +161,7 @@ public class WorkplaceRepositoryImpl implements WorkplaceRepository{
         orderSpecifier = workplaceComment.timestamp.desc();
         builder.and(workplaceComment.deleteFlag.isFalse());
         return queryFactory
-                .select(Projections.constructor(Preview.class, workplaceComment.univName, workplaceComment.workplaceName, workplaceComment.comment, workplaceComment.univCode, workplaceComment.workplaceCode, workplaceComment.rating))
+                .select(Projections.constructor(Preview.class, workplaceComment.univName, workplaceComment.workplaceName, workplaceComment.comment, workplaceComment.univCode, workplaceComment.workplaceCode, workplaceComment.rating, workplaceComment.upvote, workplaceComment.timestamp))
                 .from(workplaceComment)
                 .orderBy(orderSpecifier)
                 .limit(previewCnt)
