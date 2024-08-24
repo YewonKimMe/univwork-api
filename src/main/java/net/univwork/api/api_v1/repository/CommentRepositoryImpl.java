@@ -9,6 +9,7 @@ import net.univwork.api.api_v1.repository.jpa.JpaCommentLikeLogRepository;
 import net.univwork.api.api_v1.repository.jpa.JpaWorkplaceCommentRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -56,14 +57,20 @@ public class CommentRepositoryImpl implements CommentRepository {
             throw new RuntimeException("해당 댓글이 존재하지 않음");
         }
 
-        Optional<CommentLikeLog> findCommentLogOpt = jpaCommentLikeLogRepository.findCommentLikeLogByCommentCode(commentCode);
+        Optional<List<CommentLikeLog>> findCommentLogOpt = jpaCommentLikeLogRepository.findCommentLikeLogByCommentCode(commentCode);
 
         if (findCommentLogOpt.isEmpty()) {
             return false;
         }
-        CommentLikeLog commentLikeLog = findCommentLogOpt.get();
+        List<CommentLikeLog> commentLikeLogList = findCommentLogOpt.get();
 
-        return commentLikeLog.getIp().equals(userIp);
+        for (CommentLikeLog commentLikeLog : commentLikeLogList) {
+            if (commentLikeLog.getIp().equals(userIp)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
