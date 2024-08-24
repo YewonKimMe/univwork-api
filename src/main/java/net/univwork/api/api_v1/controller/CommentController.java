@@ -42,4 +42,14 @@ public class CommentController {
         return ResponseEntity.ok()
                 .body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), "댓글 신고가 완료되었습니다."));
     }
+
+    @PatchMapping("/like/{comment-code}")
+    public ResponseEntity<ResultAndMessage> likeComment(@PathVariable("comment-code") Long commentCode, HttpServletRequest request) {
+
+        commentService.likeComment(commentCode, request); // 좋아요 업데이트
+
+        return ResponseEntity.
+                ok()
+                .body(new SuccessResultAndMessage(HttpStatus.OK.getReasonPhrase(), commentCode + " 번 댓글 좋아요 처리 완료"));
+    }
 }
