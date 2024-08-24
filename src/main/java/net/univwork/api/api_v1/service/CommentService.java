@@ -4,11 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.univwork.api.api_v1.domain.dto.CommentReportDto;
+import net.univwork.api.api_v1.domain.entity.CommentLikeLog;
 import net.univwork.api.api_v1.domain.entity.ReportedComment;
 import net.univwork.api.api_v1.domain.entity.WorkplaceComment;
 import net.univwork.api.api_v1.enums.CookieName;
 import net.univwork.api.api_v1.enums.ReportReason;
 import net.univwork.api.api_v1.exception.AlreadyReportedException;
+import net.univwork.api.api_v1.exception.DuplicationException;
 import net.univwork.api.api_v1.exception.NoAuthenticationException;
 import net.univwork.api.api_v1.repository.CommentRepository;
 import net.univwork.api.api_v1.repository.ReportedCommentRepository;
@@ -85,5 +87,26 @@ public class CommentService {
                 .build();
 
         reportedCommentRepository.save(reportedCommentResult); // 신고 결과 저장
+    }
+
+    public void likeComment(Long commentCode, HttpServletRequest request) {
+
+        String ipAddr = IpTool.getIpAddr(request);
+        if (ipAddr.contains(",")) {
+            ipAddr = ipAddr.split(",")[0];
+        }
+        log.info("[좋아요 요청], 댓글 코드: {}, ip: {}", commentCode, ipAddr);
+        // 중복 좋아요 감지 로직 - ip
+        if (commentRepository.checkDuplicatedLikeToIp(commentCode, ipAddr)) {
+            throw new DuplicationException("이미 좋아요를 누르셨습니다.");
+        }
+        // 좋아요 업데이트
+        commentRepository.likeComment(commentCode);
+
+        // 로그 기록
+        CommentLikeLog commentLikeLog = new CommentLikeLog(commentCode, ipAddr);
+        commentRepository.saveCommentLog(commentLikeLog);
+
+        log.info("[좋아요 업데이트], 댓글 코드: {}, ip: {}", commentCode, ipAddr);
     }
 }
