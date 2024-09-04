@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor
 @ToString
-public class AddWorkplaceDto {
+public class AddWorkplaceDto { // 근로지 추가 dto
 
     private Long univCode;
 
